@@ -1,6 +1,5 @@
 body {
-    background-color: #1a1a2e;
-    color: white;
+    background-color: #F5F5F5;
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
@@ -11,42 +10,97 @@ body {
     padding: 5px;
     font-size: 12px;
 }
+
 .container {
-    background-color: #16213e;
-    padding: 10px;
-    border-radius: 20px;
+    background-color: #F5F5F5;
+    padding: 20px;
+    border-radius: 10px;
     width: 100%;
     max-width: 600px;
-    min-width: 300px; /* Added line */
+    min-width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
-    border: 1px solid white; /* Changed line */
-    min-width: 300px; /* Added line */
+    border: none;
+    min-width: 300px;
 }
+
 th, td {
-    padding: 5px;
+    padding: 10px;
     text-align: left;
     font-size: 12px;
-    border: 1px solid white; /* Changed line */
+    border-bottom: 1px solid #E7B5A6;
 }
-th {
-    background-color: #0f3460;
-}
+
 .user-info, .auction-time {
     margin-top: 20px;
 }
+
 .auction-time {
-    margin-top: 0; /* Added line */
+    margin-top: 0;
+    font-size: 1.5em;
+    text-align: center;
+    background-color: #E7B5A6;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
 }
-.connect-wallet-btn {
-    background-color: #0f3460;
+
+.connect-wallet-btn, .submit-bid-btn {
+    background-color: #E7B5A6;
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
+    font-size: 1em;
+}
+
+.connect-wallet-btn:hover, .submit-bid-btn:hover {
+    background-color: #D8A495;
+}
+
+#userBid, #walletAddressDisplay {
+    color: #D83F31;
+}
+
+/* Additional styles for the leaderboard */
+#bidsTable th:first-child, #bidsTable td:first-child {
+    width: 10%;
+}
+
+#bidsTable th:nth-child(2), #bidsTable td:nth-child(2) {
+    width: 30%;
+}
+
+#bidsTable th:last-child, #bidsTable td:last-child {
+    width: 60%;
+}
+
+/* Style for highlighting the user's bid */
+#userInfoTable th:first-child, #userInfoTable td:first-child {
+    width: 10%;
+}
+
+#userInfoTable th:nth-child(2), #userInfoTable td:nth-child(2) {
+    width: 30%;
+}
+
+#userInfoTable th:last-child, #userInfoTable td:last-child {
+    width: 60%;
+}
+
+#userInfoTable td {
+    background-color: #D83F31;
+    color: white;
+}
+
+#bidsTable {
+    background-color: #E7B5A6;
+    color: white;
 }

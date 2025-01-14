@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const account = accounts[0];
 
                 // Display the wallet address
-                document.getElementById('walletAddressDisplay').innerText = account;
+                document.getElementById('walletAddressDisplay').innerText = account.slice(0, 6) + '...' + account.slice(-4);
 
                 // Fetch top bids
                 try {
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Fetch user's bid
                 try {
                     const userBid = await contract.methods.getBidForUser(0, account).call();
-                    document.getElementById('userBid').innerText = web3.utils.fromWei(userBid.amount.toString(), 'ether') + ' ETH';
+                    document.getElementById('userBid').innerText = web3.utils.fromWei(userBid.amount.toString(), 'ether');
                 } catch (error) {
                     console.error("Error fetching user's bid:", error);
                     alert("An error occurred while fetching your bid. Please try again.");
