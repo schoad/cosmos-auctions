@@ -31,12 +31,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     for (let i = 0; i < amounts.length; i++) {
                         const row = document.createElement('tr');
+                        const bidRankCell = document.createElement('td');
                         const bidAmountCell = document.createElement('td');
                         const bidderCell = document.createElement('td');
 
+                        bidRankCell.innerText = i + 1;
+
                         try {
                             const amountInEther = web3.utils.fromWei(amounts[i].toString(), 'ether');
-                            bidAmountCell.innerText = amountInEther + ' ETH';
+                            bidAmountCell.innerText = amountInEther;
                         } catch (error) {
                             console.error('Error parsing amount', error);
                             bidAmountCell.innerText = 'Error';
@@ -44,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                         bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
 
+                        row.appendChild(bidRankCell);
                         row.appendChild(bidAmountCell);
                         row.appendChild(bidderCell);
                         bidsTableBody.appendChild(row);
