@@ -1,16 +1,18 @@
+import { ethers } from 'https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.min.js';
 import { contractAddress, contractABI } from './config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const connectWalletBtn = document.getElementById('connectWalletBtn');
     const infuraUrl = 'https://mainnet.infura.io/v3/9f3245fc6233454e8dbe7f730f466324'; // Replace with your Infura project ID
-    let web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
-    let contract = new web3.eth.Contract(contractABI, contractAddress);
+    let provider = new ethers.JsonRpcProvider(infuraUrl); // Initial provider uses Infura
+    let contract = new ethers.Contract(contractAddress, contractABI, provider);
 
     // Function to fetch and display bids
-    const fetchBids = async () => {
+    const fetchBids = async (useENS = false) => {
         try {
             const bidsTableBody = document.getElementById('bidsTableBody');
-            const bidResponse = await contract.methods.getBids(0, 14).call();
+            bidsTableBody.innerHTML = ''; // Clear existing rows
+            const bidResponse = await contract.getBids(0, 14);
 
             const amounts = bidResponse.amounts;
             const users = bidResponse.users;
@@ -24,14 +26,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                 bidRankCell.innerText = i + 1;
 
                 try {
-                    const amountInEther = parseFloat(web3.utils.fromWei(amounts[i].toString(), 'ether')).toFixed(2);
+                    const amountInEther = parseFloat(ethers.formatEther(amounts[i])).toFixed(2);
                     bidAmountCell.innerText = amountInEther;
                 } catch (error) {
                     console.error('Error parsing amount', error);
                     bidAmountCell.innerText = 'Error';
                 }
 
-                bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
+                // Only perform ENS lookup if useENS is true
+                if (useENS) {
+                    let ensName = null;
+                    try {
+                        ensName = await provider.lookupAddress(users[i]);
+                    } catch (error) {
+                        console.error(`Error looking up ENS name for ${users[i]}`, error);
+                    }
+
+                    if (ensName) {
+                        bidderCell.innerText = ensName;
+                    } else {
+                        bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
+                    }
+                } else {
+                    // If not using ENS, just show truncated address
+                    bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
+                }
 
                 row.appendChild(bidRankCell);
                 row.appendChild(bidAmountCell);
@@ -47,8 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and display user's bid
     const fetchUserBid = async (account) => {
         try {
-            const userBid = await contract.methods.getBidForUser(0, account).call();
-            document.getElementById('userBid').innerText = web3.utils.fromWei(userBid.amount.toString(), 'ether');
+            const userBid = await contract.getBidForUser(0, account);
+            document.getElementById('userBid').innerText = ethers.formatEther(userBid.amount);
         } catch (error) {
             console.error("Error fetching user's bid:", error);
             alert("An error occurred while fetching your bid. Please try again.");
@@ -58,9 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and display auction time
     const fetchAuctionTime = async () => {
         try {
-            const auctionInfo = await contract.methods.getAuction(0).call();
-            const startTime = parseInt(auctionInfo[1]) * 1000; // Convert to milliseconds
-            const endTime = parseInt(auctionInfo[2]) * 1000; // Convert to milliseconds
+            const auctionInfo = await contract.getAuction(0);
+            const startTime = Number(auctionInfo[1]) * 1000; // Convert to milliseconds
+            const endTime = Number(auctionInfo[2]) * 1000; // Convert to milliseconds
             const now = Date.now();
 
             // Calculate remaining time
@@ -94,32 +113,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Initial fetch of bids and auction time using Infura
-    await fetchBids();
+    await fetchBids(); // Initially, we don't use ENS
     await fetchAuctionTime();
 
     connectWalletBtn.addEventListener('click', async () => {
         if (typeof window.ethereum !== 'undefined') {
             try {
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
-                web3 = new Web3(window.ethereum);
-                contract = new web3.eth.Contract(contractABI, contractAddress);
+                const web3Provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await web3Provider.getSigner();
+                const contractWithSigner = contract.connect(signer);
+        
+                // Update provider and contract after wallet connection
+                provider = web3Provider;
+                contract = contractWithSigner;
 
-                // Get the current account
-                const accounts = await web3.eth.getAccounts();
-                const account = accounts[0];
+                // Get the current account address from the signer
+                const account = await signer.getAddress();
+        
+                console.log('Account:', account, typeof account);
+        
+                if (account && typeof account === 'string') {
+                    // Display the wallet address
+                    document.getElementById('walletAddressDisplay').innerText = account.slice(0, 6) + '...' + account.slice(-4);
+        
+                    // Fetch user's bid using the connected wallet
+                    await fetchUserBid(account);
+        
+                    // Show the user info table
+                    document.getElementById('userInfoTable').classList.remove('hidden');
+        
+                    // Hide the connect wallet button after successful connection
+                    connectWalletBtn.style.display = 'none';
 
-                // Display the wallet address
-                document.getElementById('walletAddressDisplay').innerText = account.slice(0, 6) + '...' + account.slice(-4);
-
-                // Fetch user's bid using the connected wallet
-                await fetchUserBid(account);
-
-                // Show the user info table
-                document.getElementById('userInfoTable').classList.remove('hidden');
-
-                // Hide the connect wallet button after successful connection
-                connectWalletBtn.style.display = 'none';
-
+                    // Fetch bids again but now using ENS
+                    await fetchBids(true); // Pass true to use ENS lookup
+                } else {
+                    console.error('Account is not a string or is undefined:', account);
+                    alert('Failed to connect wallet. Please try again.');
+                }
+        
             } catch (error) {
                 console.error("Error:", error);
                 alert("An error occurred. Please try again.");
