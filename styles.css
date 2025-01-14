@@ -35,11 +35,20 @@ table {
     flex-grow: 1;
 }
 
-th, td {
-    padding: 1px 20px;
+th, td{
+    text-align: left;
+    font-size: 1px;
     text-align: left;
     font-size: 12px;
-    border-bottom: 1px solid #E7B5A6;
+    border-bottom: 1px solid white; /* Changed to white for visibility on dark background */
+}
+
+th {
+    padding: 10px 20px;
+}
+
+td {
+    padding: 1px 20px;
 }
 
 .user-info, .auction-time {
