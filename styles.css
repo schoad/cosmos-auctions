@@ -1,0 +1,52 @@
+body {
+    background-color: #1a1a2e;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    background-color: #16213e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+}
+.icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+.ens-name {
+    font-size: 18px;
+}
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #0f3460;
+}
+.user-info, .auction-time {
+    margin-top: 20px;
+}
+.connect-wallet-btn {
+    background-color: #0f3460;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}

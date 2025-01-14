@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Auction Display</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; align-items: center;">
+            <img class="icon" id="walletIcon" src="" alt="Wallet Icon">
+            <span class="wallet-address" id="walletAddressDisplay"></span>
+        </div>
+        <table id="bidsTable">
+            <thead>
+                <tr>
+                    <th>Bidder</th>
+                    <th>Current Bid</th>
+                </tr>
+            </thead>
+            <tbody id="bidsTableBody"></tbody>
+        </table>
+        <div class="user-info">
+            <p>Your Current Bid: <span id="userBid"></span></p>
+        </div>
+        <div class="auction-time">
+            <p>Auction Time Remaining: <span id="timeRemaining"></span></p>
+        </div>
+        <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
+    </div>
+    <script type="module" src="config.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
