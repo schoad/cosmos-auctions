@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         bidRankCell.innerText = i + 1;
 
                         try {
-                            const amountInEther = web3.utils.fromWei(amounts[i].toString(), 'ether');
+                            const amountInEther = parseFloat(web3.utils.fromWei(amounts[i].toString(), 'ether')).toFixed(2);
                             bidAmountCell.innerText = amountInEther;
                         } catch (error) {
                             console.error('Error parsing amount', error);
