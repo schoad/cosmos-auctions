@@ -2,14 +2,107 @@ import { contractAddress, contractABI } from './config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const connectWalletBtn = document.getElementById('connectWalletBtn');
+    const infuraUrl = 'https://mainnet.infura.io/v3/9f3245fc6233454e8dbe7f730f466324'; // Replace with your Infura project ID
+    let web3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
+    let contract = new web3.eth.Contract(contractABI, contractAddress);
+
+    // Function to fetch and display bids
+    const fetchBids = async () => {
+        try {
+            const bidsTableBody = document.getElementById('bidsTableBody');
+            const bidResponse = await contract.methods.getBids(0, 14).call();
+
+            const amounts = bidResponse.amounts;
+            const users = bidResponse.users;
+
+            for (let i = 0; i < amounts.length; i++) {
+                const row = document.createElement('tr');
+                const bidRankCell = document.createElement('td');
+                const bidAmountCell = document.createElement('td');
+                const bidderCell = document.createElement('td');
+
+                bidRankCell.innerText = i + 1;
+
+                try {
+                    const amountInEther = parseFloat(web3.utils.fromWei(amounts[i].toString(), 'ether')).toFixed(2);
+                    bidAmountCell.innerText = amountInEther;
+                } catch (error) {
+                    console.error('Error parsing amount', error);
+                    bidAmountCell.innerText = 'Error';
+                }
+
+                bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
+
+                row.appendChild(bidRankCell);
+                row.appendChild(bidAmountCell);
+                row.appendChild(bidderCell);
+                bidsTableBody.appendChild(row);
+            }
+        } catch (error) {
+            console.error('Error fetching bids', error);
+            alert('Failed to fetch bids: ' + error.message);
+        }
+    };
+
+    // Function to fetch and display user's bid
+    const fetchUserBid = async (account) => {
+        try {
+            const userBid = await contract.methods.getBidForUser(0, account).call();
+            document.getElementById('userBid').innerText = web3.utils.fromWei(userBid.amount.toString(), 'ether');
+        } catch (error) {
+            console.error("Error fetching user's bid:", error);
+            alert("An error occurred while fetching your bid. Please try again.");
+        }
+    };
+
+    // Function to fetch and display auction time
+    const fetchAuctionTime = async () => {
+        try {
+            const auctionInfo = await contract.methods.getAuction(0).call();
+            const startTime = parseInt(auctionInfo[1]) * 1000; // Convert to milliseconds
+            const endTime = parseInt(auctionInfo[2]) * 1000; // Convert to milliseconds
+            const now = Date.now();
+
+            // Calculate remaining time
+            const timeLeft = endTime - now;
+            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            document.getElementById('timeRemaining').innerText = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Update auction time every second
+            setInterval(async () => {
+                const now = Date.now();
+                const timeLeft = endTime - now;
+                if (timeLeft > 0) {
+                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    document.getElementById('timeRemaining').innerText = 
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    document.getElementById('timeRemaining').innerText = 'Auction Ended';
+                    clearInterval(this);
+                }
+            }, 1000); // Update every second
+        } catch (error) {
+            console.error("Error fetching auction time:", error);
+            alert("An error occurred while fetching auction time. Please try again.");
+        }
+    };
+
+    // Initial fetch of bids and auction time using Infura
+    await fetchBids();
+    await fetchAuctionTime();
 
     connectWalletBtn.addEventListener('click', async () => {
         if (typeof window.ethereum !== 'undefined') {
             try {
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const web3 = new Web3(window.ethereum);
-               
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(contractABI, contractAddress);
 
                 // Get the current account
                 const accounts = await web3.eth.getAccounts();
@@ -18,86 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Display the wallet address
                 document.getElementById('walletAddressDisplay').innerText = account.slice(0, 6) + '...' + account.slice(-4);
 
-                // Fetch top bids
-                try {
-                    const bidsTableBody = document.getElementById('bidsTableBody');
-                    const bidResponse = await contract.methods.getBids(0, 14).call();
+                // Fetch user's bid using the connected wallet
+                await fetchUserBid(account);
 
-                    const amounts = bidResponse.amounts;
-                    const users = bidResponse.users;
-
-                    for (let i = 0; i < amounts.length; i++) {
-                        const row = document.createElement('tr');
-                        const bidRankCell = document.createElement('td');
-                        const bidAmountCell = document.createElement('td');
-                        const bidderCell = document.createElement('td');
-
-                        bidRankCell.innerText = i + 1;
-
-                        try {
-                            const amountInEther = parseFloat(web3.utils.fromWei(amounts[i].toString(), 'ether')).toFixed(2);
-                            bidAmountCell.innerText = amountInEther;
-                        } catch (error) {
-                            console.error('Error parsing amount', error);
-                            bidAmountCell.innerText = 'Error';
-                        }
-
-                        bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
-
-                        row.appendChild(bidRankCell);
-                        row.appendChild(bidAmountCell);
-                        row.appendChild(bidderCell);
-                        bidsTableBody.appendChild(row);
-                    }
-                } catch (error) {
-                    console.error('Error fetching bids', error);
-                    alert('Failed to fetch bids: ' + error.message);
-                }
-
-                // Fetch user's bid
-                try {
-                    const userBid = await contract.methods.getBidForUser(0, account).call();
-                    document.getElementById('userBid').innerText = web3.utils.fromWei(userBid.amount.toString(), 'ether');
-                } catch (error) {
-                    console.error("Error fetching user's bid:", error);
-                    alert("An error occurred while fetching your bid. Please try again.");
-                }
-
-                // Re-enable auction time fetching
-                try {
-                    const auctionInfo = await contract.methods.getAuction(0).call();
-                    const startTime = parseInt(auctionInfo[1]) * 1000; // Convert to milliseconds
-                    const endTime = parseInt(auctionInfo[2]) * 1000; // Convert to milliseconds
-                    const now = Date.now();
-
-                    // Calculate remaining time
-                    const timeLeft = endTime - now;
-                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                    document.getElementById('timeRemaining').innerText = 
-                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                    // Update auction time every second
-                    setInterval(async () => {
-                        const now = Date.now();
-                        const timeLeft = endTime - now;
-                        if (timeLeft > 0) {
-                            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                            document.getElementById('timeRemaining').innerText = 
-                                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                        } else {
-                            document.getElementById('timeRemaining').innerText = 'Auction Ended';
-                            clearInterval(this);
-                        }
-                    }, 1000); // Update every second
-                } catch (error) {
-                    console.error("Error fetching auction time:", error);
-                    alert("An error occurred while fetching auction time. Please try again.");
-                }
+                // Show the user info table
+                document.getElementById('userInfoTable').classList.remove('hidden');
 
                 // Hide the connect wallet button after successful connection
                 connectWalletBtn.style.display = 'none';

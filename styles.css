@@ -104,3 +104,7 @@ th, td {
     background-color: #E7B5A6;
     color: white;
 }
+
+.hidden {
+    display: none;
+}
