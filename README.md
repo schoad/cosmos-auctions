@@ -58,3 +58,9 @@ Contributions are welcome! Please follow these steps:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Disclaimer
+
+This application, COSMOS Auction Viewer, is a community contribution and is not an official product of the Renga team. It is developed and maintained by independent community members with no direct affiliation to or endorsement from the official Renga project or its developers. 
+
+Please use this tool at your own risk. The creators of this application are not responsible for any losses, damages, or misrepresentations arising from its use. Always verify information independently and consult official sources for the most accurate and up-to-date information related to the Renga auction or project.
