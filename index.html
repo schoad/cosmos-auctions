@@ -9,9 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <div style="display: flex; align-items: center;">
-            <span class="wallet-address" id="walletAddressDisplay"></span>
-        </div>
+        <div class="auction-time"><p>Auction Timer: <span id="timeRemaining"></span></p></div>
         <table id="bidsTable">
             <thead>
                 <tr>
@@ -24,11 +22,9 @@
         </table>
         <div class="user-info">
             <p>Your Current Bid: <span id="userBid"></span></p>
+            <p>Your Address: <span id="walletAddressDisplay"></span></p>
         </div>
-        <div class="auction-time">
-            <p>Auction Time Remaining: <span id="timeRemaining"></span></p>
-        </div>
-        <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
+        <button class="connect-wallet-btn" id="connectWalletBtn">Connect</button>
     </div>
     <script type="module" src="config.js"></script>
     <script type="module" src="script.js"></script>

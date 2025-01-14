@@ -8,38 +8,36 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
-    padding: 20px;
+    padding: 5px;
+    font-size: 12px;
 }
 .container {
     background-color: #16213e;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
+    padding: 10px;
+    border-radius: 20px;
+    width: 30%;
     max-width: 600px;
-}
-.icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-.ens-name {
-    font-size: 18px;
 }
 table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
+    border: 1px solid white; /* Changed line */
 }
 th, td {
-    padding: 10px;
+    padding: 5px;
     text-align: left;
+    font-size: 12px;
+    border: 1px solid white; /* Changed line */
 }
 th {
     background-color: #0f3460;
 }
 .user-info, .auction-time {
     margin-top: 20px;
+}
+.auction-time {
+    margin-top: 0; /* Added line */
 }
 .connect-wallet-btn {
     background-color: #0f3460;
