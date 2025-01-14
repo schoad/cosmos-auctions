@@ -72,26 +72,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     // Calculate remaining time
                     const timeLeft = endTime - now;
-                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-                    document.getElementById('timeRemaining').innerText = `${days} days, ${hours} hours, ${minutes} minutes`;
+                    document.getElementById('timeRemaining').innerText = 
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-                    // Update auction time every minute
+                    // Update auction time every second
                     setInterval(async () => {
                         const now = Date.now();
                         const timeLeft = endTime - now;
                         if (timeLeft > 0) {
-                            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
                             const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                            document.getElementById('timeRemaining').innerText = `${days} days, ${hours} hours, ${minutes} minutes`;
+                            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                            document.getElementById('timeRemaining').innerText = 
+                                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                         } else {
                             document.getElementById('timeRemaining').innerText = 'Auction Ended';
                             clearInterval(this);
                         }
-                    }, 60000); // Update every minute
+                    }, 1000); // Update every second
                 } catch (error) {
                     console.error("Error fetching auction time:", error);
                     alert("An error occurred while fetching auction time. Please try again.");
