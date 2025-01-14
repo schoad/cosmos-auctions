@@ -62,12 +62,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     alert("An error occurred while fetching your bid. Please try again.");
                 }
 
-                // Commenting out auction time fetching for now
-                /*
+                // Re-enable auction time fetching
                 try {
                     const auctionInfo = await contract.methods.getAuction(0).call();
-                    const startTime = parseInt(auctionInfo.starttime) * 1000; // Convert to milliseconds
-                    const endTime = parseInt(auctionInfo.endtime) * 1000; // Convert to milliseconds
+                    const startTime = parseInt(auctionInfo[1]) * 1000; // Convert to milliseconds
+                    const endTime = parseInt(auctionInfo[2]) * 1000; // Convert to milliseconds
                     const now = Date.now();
 
                     // Calculate remaining time
@@ -96,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error("Error fetching auction time:", error);
                     alert("An error occurred while fetching auction time. Please try again.");
                 }
-                */
 
                 // Hide the connect wallet button after successful connection
                 connectWalletBtn.style.display = 'none';
