@@ -6,6 +6,8 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
+    max-height: 600px;
+    overflow: hidden;
     margin: 0;
     padding: 5px;
     font-size: 12px;
@@ -19,6 +21,10 @@ body {
     max-width: 600px;
     min-width: 300px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 table {
@@ -27,6 +33,7 @@ table {
     border-collapse: collapse;
     border: none;
     min-width: 300px;
+    flex-grow: 1;
 }
 
 th, td {
@@ -48,6 +55,7 @@ th, td {
     color: white;
     padding: 10px;
     border-radius: 10px;
+    flex-shrink: 0;
 }
 
 .connect-wallet-btn, .submit-bid-btn {
@@ -59,6 +67,7 @@ th, td {
     cursor: pointer;
     margin-top: 20px;
     font-size: 1em;
+    flex-shrink: 0;
 }
 
 .connect-wallet-btn:hover, .submit-bid-btn:hover {
