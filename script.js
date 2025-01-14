@@ -16,11 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const account = accounts[0];
 
                 // Display the wallet address
-                //document.getElementById('walletAddressDisplay').innerText = account.slice(0, 6) + '...' + account.slice(-4);
                 document.getElementById('walletAddressDisplay').innerText = account;
-
-                // Set the wallet icon (you can use a placeholder or actual wallet icon URL)
-                document.getElementById('walletIcon').src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='; // Placeholder image
 
                 // Fetch top bids
                 try {
