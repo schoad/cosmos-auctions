@@ -23,6 +23,12 @@
         <div class="user-info">
             <p>Your Current Bid: <span id="userBid"></span></p>
             <p>Your Address: <span id="walletAddressDisplay"></span></p>
+            <button id="placeBidBtn" style="display:none;">Place Bid</button>
+            <button id="raiseBidBtn" style="display:none;">Raise Bid</button>
+            <div id="bidInputMask" style="display:none;">
+                <input type="number" id="bidAmount" step="0.01" min="0.01" placeholder="Enter bid amount in ETH">
+                <button id="submitBidBtn">Submit Bid</button>
+            </div>
         </div>
         <button class="connect-wallet-btn" id="connectWalletBtn">Connect</button>
     </div>
