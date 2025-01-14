@@ -11,12 +11,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const fetchBids = async (useENS = false) => {
         try {
             const bidsTableBody = document.getElementById('bidsTableBody');
-            bidsTableBody.innerHTML = ''; // Clear existing rows
             const bidResponse = await contract.getBids(0, 14);
 
             const amounts = bidResponse.amounts;
             const users = bidResponse.users;
 
+            // If using ENS, resolve all names before updating the table
+            let resolvedUsers = [];
+            if (useENS) {
+                resolvedUsers = await Promise.all(users.map(async (user) => {
+                    try {
+                        return await provider.lookupAddress(user) || user.slice(0, 6) + '...' + user.slice(-4);
+                    } catch (error) {
+                        console.error(`Error looking up ENS name for ${user}`, error);
+                        return user.slice(0, 6) + '...' + user.slice(-4);
+                    }
+                }));
+            } else {
+                // If not using ENS, just map to truncated addresses
+                resolvedUsers = users.map(user => user.slice(0, 6) + '...' + user.slice(-4));
+            }
+
+            // Update table in one go
+            bidsTableBody.innerHTML = ''; // Clear existing rows
             for (let i = 0; i < amounts.length; i++) {
                 const row = document.createElement('tr');
                 const bidRankCell = document.createElement('td');
@@ -33,30 +50,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     bidAmountCell.innerText = 'Error';
                 }
 
-                // Only perform ENS lookup if useENS is true
-                if (useENS) {
-                    let ensName = null;
-                    try {
-                        ensName = await provider.lookupAddress(users[i]);
-                    } catch (error) {
-                        console.error(`Error looking up ENS name for ${users[i]}`, error);
-                    }
-
-                    if (ensName) {
-                        bidderCell.innerText = ensName;
-                    } else {
-                        bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
-                    }
-                } else {
-                    // If not using ENS, just show truncated address
-                    bidderCell.innerText = users[i].slice(0, 6) + '...' + users[i].slice(-4);
-                }
+                bidderCell.innerText = resolvedUsers[i]; // Use resolved or truncated address
 
                 row.appendChild(bidRankCell);
                 row.appendChild(bidAmountCell);
                 row.appendChild(bidderCell);
                 bidsTableBody.appendChild(row);
             }
+
         } catch (error) {
             console.error('Error fetching bids', error);
             alert('Failed to fetch bids: ' + error.message);
