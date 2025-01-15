@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event listener for toggle switch
     toggleSwitch.addEventListener('change', () => {
-        setColumns(toggleSwitch.checked ? 3 : 2);
+        setColumns(toggleSwitch.checked ? 2 : 3); // Changed logic here
         refreshGallery(); // Refresh the gallery when changing columns
     });
 
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (width < 901) {
             setColumns(2);
         } else {
-            setColumns(toggleSwitch.checked ? 3 : 2);
+            setColumns(toggleSwitch.checked ? 2 : 3); // Changed default to 3
         }
         refreshGallery(); // Refresh the gallery when resizing
     };
@@ -117,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Initial setup
+    setColumns(3); // Set default to 3 columns
     adjustForWindowSize();
     refreshGallery(); // Display images for the initially selected week
 
