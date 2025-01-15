@@ -1,15 +1,16 @@
 body {
-    background-color: #000000;
+    background-color: black;
+    color: white;
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    max-height: 600px;
     overflow: hidden;
     padding: 5px;
     font-size: 12px;
+    margin: 0;
 }
 
 .container {
@@ -20,63 +21,61 @@ body {
     max-width: 600px;
     min-width: 300px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    height: 100%;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    max-height: calc(100vh - 40px);
+    overflow-y: hidden;
 }
 
 table {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 20px;
     border-collapse: collapse;
     border: none;
     min-width: 300px;
-    flex-grow: 1;
 }
 
-th, td{
-    text-align: left;
-    font-size: 1px;
+th, td {
     text-align: left;
     font-size: 12px;
-    border-bottom: 1px solid white; /* Changed to white for visibility on dark background */
-}
-
-th {
+    border-bottom: 1px solid white;
     padding: 10px 20px;
 }
 
-td {
-    padding: 1px 20px;
-}
-
-.user-info, .auction-time {
-    margin-top: 10px;
+th {
+    font-weight: bold;
 }
 
 .auction-time {
-    margin-top: 0;
     font-size: 1.5em;
     text-align: center;
     background-color: #E7B5A6;
     color: white;
     border-radius: 10px;
-    flex-shrink: 0;
+    padding: 10px;
+    margin-bottom: 20px;
 }
 
-.connect-wallet-btn, .submit-bid-btn {
+.connect-wallet-btn, .gallery-btn {
     background-color: #E7B5A6;
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.5em;
-    flex-shrink: 0;
+    font-size: 1em;
+    margin-right: 10px;
+    margin-top: 20px;
+    transition: background-color 0.3s;
 }
 
-.connect-wallet-btn:hover, .submit-bid-btn:hover {
+.gallery-btn {
+    margin-right: 0;
+}
+
+.connect-wallet-btn:hover, .gallery-btn:hover, .submit-bid-btn:hover {
     background-color: #D8A495;
 }
 
@@ -85,34 +84,21 @@ td {
 }
 
 /* Additional styles for the leaderboard */
-#bidsTable th:first-child, #bidsTable td:first-child {
+#bidsTable th:nth-child(1), #bidsTable td:nth-child(1) {
     width: 10%;
 }
-
 #bidsTable th:nth-child(2), #bidsTable td:nth-child(2) {
     width: 30%;
 }
-
-#bidsTable th:last-child, #bidsTable td:last-child {
+#bidsTable th:nth-child(3), #bidsTable td:nth-child(3) {
     width: 60%;
 }
 
 /* Style for highlighting the user's bid */
-#userInfoTable th:first-child, #userInfoTable td:first-child {
-    width: 10%;
-}
-
-#userInfoTable th:nth-child(2), #userInfoTable td:nth-child(2) {
-    width: 30%;
-}
-
-#userInfoTable th:last-child, #userInfoTable td:last-child {
-    width: 60%;
-}
-
 #userInfoTable td {
     background-color: #D83F31;
     color: white;
+    padding: 10px 20px;
 }
 
 #bidsTable {
@@ -122,11 +108,6 @@ td {
 
 .hidden {
     display: none;
-}
-
-body {
-    background-color: black;
-    color: white;
 }
 
 .header-bar {
@@ -147,10 +128,20 @@ button {
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.5em;
-    flex-shrink: 0;
+    font-size: 1em;
+    transition: background-color 0.3s;
 }
 
 button:hover {
     background-color: #D8A495;
+}
+
+@media (max-width: 600px) {
+    .container {
+        max-height: 100vh;
+        padding: 10px;
+    }
+    #bidsTable {
+        font-size: 10px;
+    }
 }
