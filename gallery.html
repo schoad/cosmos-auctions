@@ -12,18 +12,31 @@
             height: 100%; /* Ensures body takes up full viewport height */
             background-color: black; /* Changed background color to black */
             color: white; /* Changed text color to white for visibility */
+            font-family: Arial, sans-serif;
+        }
+        .header-bar {
+            background-color: #E7B5A6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .gallery {
             padding: 20px;
             max-width: 1000px; /* Optional: Limit the gallery width */
             margin: 0 auto; /* Center the gallery */
-            height: calc(100% - 40px); /* Adjust for padding */
+            height: calc(100% - 40px); /* Adjust for padding and header */
+            display: flex;
+            flex-direction: column;
         }
         .nft-gallery {
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* Default to 2 columns */
             gap: 10px;
-            max-height: calc(100% - 80px); /* Adjust based on header/footer heights */
+            max-height: calc(100% - 140px); /* Adjust for header and footer */
             overflow-y: auto; /* Use auto for better scroll behavior */
             scrollbar-width: none; /* Hide scrollbar for Firefox */
         }
@@ -37,7 +50,7 @@
             cursor: pointer; /* Change cursor to indicate clickability */
         }
         .toggle-switch {
-            margin-bottom: 20px;
+            margin: 0;
             width: 60px;
             height: 34px;
             position: relative;
@@ -53,7 +66,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #D83F31; /* Change to one of the red shades used */
             transition: .4s;
             border-radius: 34px;
         }
@@ -69,7 +82,7 @@
             border-radius: 50%;
         }
         input:checked + .slider {
-            background-color: #2196F3;
+            background-color: #D83F31; /* Use the same red shade when checked */
         }
         input:checked + .slider:before {
             transform: translateX(26px);
@@ -92,6 +105,11 @@
             max-height: 90%;
             object-fit: contain;
         }
+        /* Add margin between header and gallery */
+        .gallery > .nft-gallery {
+            margin-top: 10px; /* Assuming grid gap is 10px */
+            background-color: black; /* Match the background color */
+        }
         /* Responsive design for smaller screens */
         @media (max-width: 600px) {
             .nft-gallery {
@@ -108,11 +126,13 @@
 </head>
 <body>
     <div class="gallery">
-        <h2>Newly Minted NFTs</h2>
-        <label class="toggle-switch">
-            <input type="checkbox" id="columnToggle">
-            <span class="slider"></span>
-        </label>
+        <div class="header-bar">
+            <p>NFT Gallery</p>
+            <label class="toggle-switch">
+                <input type="checkbox" id="columnToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
         <div id="nftGallery" class="nft-gallery"></div>
         <button class="back-btn" onclick="location.href='index.html'">Back to Auction</button>
     </div>
