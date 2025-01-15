@@ -6,13 +6,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const infuraUrl = 'https://mainnet.infura.io/v3/9f3245fc6233454e8dbe7f730f466324'; // Replace with your Infura project ID
     let provider = new ethers.JsonRpcProvider(infuraUrl); // Initial provider uses Infura
     let contract = new ethers.Contract(contractAddress, contractABI, provider);
-    let pauseRequests = false; // Flag to pause requests
+    let pauseRequests = false; 
+    let isWalletConnected = false; // New variable to track wallet connection
+    let selectedWeek = 1; // Global declaration, initialized to 1
     const weekSelect = document.getElementById('weekSelect');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
 
     // Set default to Week 1
-    weekSelect.value = '0'; // Assuming '0' is the value for Week 1
+    weekSelect.value = '1'; 
 
     // Function to test Infura connection
     async function testInfuraConnection() {
@@ -37,11 +39,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Test connection before any other operation
-    await testInfuraConnection();
+    // Test connection before any other operation if wallet is not connected
+    if (!isWalletConnected) {
+        await testInfuraConnection();
+    }
 
-    // Periodic check every 60 seconds
-    setInterval(testInfuraConnection, 60000); // 60,000 ms = 60 seconds
+    // Periodic check every 60 seconds if there's no active wallet connection
+    let infuraCheckInterval = setInterval(() => {
+        if (!isWalletConnected) {
+            testInfuraConnection();
+        } else {
+            clearInterval(infuraCheckInterval); // Stop checking if wallet is connected
+        }
+    }, 60000); // 60,000 ms = 60 seconds
 
     // Wrapper for making requests, which will check if requests are allowed
     async function makeRequest(fn, ...args) {
@@ -56,9 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and display bids
     const fetchBids = async (useENS = false) => {
         try {
-            const selectedWeek = parseInt(weekSelect.value);
+            // Use the global selectedWeek here
+            const weekIndex = selectedWeek - 1; // Convert to 0-based index
             const bidsTableBody = document.getElementById('bidsTableBody');
-            const bidResponse = await makeRequest(contract.getBids, selectedWeek, 14);
+            const bidResponse = await makeRequest(contract.getBids, weekIndex, 14);
 
             const amounts = bidResponse.amounts;
             const users = bidResponse.users;
@@ -122,8 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and display user's bid
     const fetchUserBid = async (account) => {
         try {
-            const selectedWeek = parseInt(weekSelect.value);
-            const userBid = await makeRequest(contract.getBidForUser, selectedWeek, account);
+            // Use the global selectedWeek here
+            const weekIndex = selectedWeek - 1; // Convert to 0-based index
+            const userBid = await makeRequest(contract.getBidForUser, weekIndex, account);
             document.getElementById('userBid').innerText = ethers.formatEther(userBid.amount);
         } catch (error) {
             console.error("Error fetching user's bid:", error);
@@ -138,8 +150,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and display auction time
     const fetchAuctionTime = async () => {
         try {
-            const selectedWeek = parseInt(weekSelect.value);
-            const auctionInfo = await makeRequest(contract.getAuction, selectedWeek);
+            // Use the global selectedWeek here
+            const weekIndex = selectedWeek - 1; // Convert to 0-based index
+            const auctionInfo = await makeRequest(contract.getAuction, weekIndex);
             const startTime = Number(auctionInfo[1]) * 1000; // Convert to milliseconds
             const endTime = Number(auctionInfo[2]) * 1000; // Convert to milliseconds
             const now = Date.now();
@@ -187,6 +200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listener for week selection
     weekSelect.addEventListener('change', async () => {
         if (!pauseRequests) {
+            // Update the global selectedWeek when the user changes the selection
+            selectedWeek = parseInt(weekSelect.value); 
             await fetchBids();
             await fetchAuctionTime();
         } else {
@@ -208,6 +223,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Reset pauseRequests to false after successful wallet connection
                 pauseRequests = false;
+
+                // Set wallet connection status
+                isWalletConnected = true;
 
                 // Get the current account address from the signer
                 const account = await signer.getAddress();
