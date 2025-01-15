@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFT Gallery</title>
     <style>
-        body {
+        html, body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            overflow: hidden; /* Prevents browser scrollbar */
+            height: 100%; /* Ensures body takes up full viewport height */
             background-color: black; /* Changed background color to black */
             color: white; /* Changed text color to white for visibility */
         }
@@ -16,27 +17,24 @@
             padding: 20px;
             max-width: 1000px; /* Optional: Limit the gallery width */
             margin: 0 auto; /* Center the gallery */
+            height: calc(100% - 40px); /* Adjust for padding */
         }
         .nft-gallery {
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* Default to 2 columns */
             gap: 10px;
-            max-height: calc(100vh - 150px); /* Adjust based on header and footer heights */
+            max-height: calc(100% - 80px); /* Adjust based on header/footer heights */
             overflow-y: auto; /* Use auto for better scroll behavior */
-            scrollbar-width: thin; /* Show thin scrollbar for Firefox */
-            scrollbar-color: #888 transparent; /* Scrollbar color */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
         }
         .nft-gallery::-webkit-scrollbar {
-            width: 8px; /* Width of the scrollbar */
-        }
-        .nft-gallery::-webkit-scrollbar-thumb {
-            background-color: #888; /* Color of the scrollbar thumb */
-            border-radius: 4px;
+            display: none; /* Hide scrollbar for WebKit browsers */
         }
         .nft-gallery img {
             width: 100%;
             height: auto;
             object-fit: cover; /* Ensure images maintain aspect ratio */
+            cursor: pointer; /* Change cursor to indicate clickability */
         }
         .toggle-switch {
             margin-bottom: 20px;
@@ -76,6 +74,24 @@
         input:checked + .slider:before {
             transform: translateX(26px);
         }
+        /* Full screen image overlay */
+        .full-screen-image {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .full-screen-image img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
         /* Responsive design for smaller screens */
         @media (max-width: 600px) {
             .nft-gallery {
@@ -100,10 +116,12 @@
         <div id="nftGallery" class="nft-gallery"></div>
         <button class="back-btn" onclick="location.href='index.html'">Back to Auction</button>
     </div>
+    <div id="fullScreenImage" class="full-screen-image"></div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const gallery = document.getElementById('nftGallery');
             const toggleSwitch = document.getElementById('columnToggle');
+            const fullScreenImage = document.getElementById('fullScreenImage');
 
             // Function to set the number of columns
             const setColumns = (columns) => {
@@ -141,7 +159,35 @@
                 img.onerror = function() {
                     this.src = `src/images/small/cosmos_${tokenId}_small.gif`;
                 };
+                img.addEventListener('click', function() {
+                    displayFullScreenImage(tokenId);
+                });
                 gallery.appendChild(img);
+            }
+
+            // Function to display full screen image
+            function displayFullScreenImage(tokenId) {
+                const img = document.createElement('img');
+                img.src = `src/images/original/cosmos_${tokenId}.png`;
+                img.alt = `NFT ${tokenId} Full`;
+                img.onerror = function() {
+                    this.src = `src/images/original/cosmos_${tokenId}.gif`;
+                };
+                img.addEventListener('click', closeFullScreenImage);
+
+                while (fullScreenImage.firstChild) {
+                    fullScreenImage.removeChild(fullScreenImage.firstChild);
+                }
+                fullScreenImage.appendChild(img);
+                fullScreenImage.style.display = 'flex';
+            }
+
+            // Function to close full screen image
+            function closeFullScreenImage() {
+                fullScreenImage.style.display = 'none';
+                while (fullScreenImage.firstChild) {
+                    fullScreenImage.removeChild(fullScreenImage.firstChild);
+                }
             }
         });
     </script>
