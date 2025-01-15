@@ -30,8 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to display images based on selected week
     function refreshGallery() {
-        const selectedWeek = parseInt(weekSelect.value);
-        const startTokenId = (selectedWeek - 1) * 14 + 216; // Adjust start based on week
+        // Change: Since weekSelect values are now strings, we remove the parseInt call
+        const selectedWeek = weekSelect.value;
+        // Adjust calculation for token IDs since weeks are now string values
+        const startTokenId = (parseInt(selectedWeek) - 1) * 14 + 216; // Adjust start based on week
         const endTokenId = startTokenId + 13;
 
         // Clear existing images
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gallery.style.display = 'block'; // Reset display for single image
         gallery.style.overflow = 'hidden'; // Prevent scrolling
 
-        if (selectedWeek === 1) { // Only Week 1 has available images
+        if (selectedWeek === '1') { // Only Week 1 has available images
             gallery.style.display = 'grid'; // Revert to grid for multiple images
             gallery.style.height = 'auto'; // Let it adjust to content
             for (let tokenId = startTokenId; tokenId <= endTokenId; tokenId++) {
@@ -107,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gallery.style.maxHeight = `${availableHeight}px`;
     }
 
-    // Event listener for week selection
+    // Event listener for week selection - no need for parseInt since values are strings
     weekSelect.addEventListener('change', refreshGallery);
 
     // Adjust columns and gallery height when window is resized
