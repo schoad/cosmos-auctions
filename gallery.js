@@ -69,4 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
             fullScreenImage.removeChild(fullScreenImage.firstChild);
         }
     }
+
+    // Function to adjust height dynamically
+    const adjustHeight = () => {
+        const headerHeight = document.querySelector('.header-bar').offsetHeight;
+        const footerHeight = document.querySelector('.back-btn')?.offsetHeight || 0;
+        const content = document.querySelector('.gallery');
+        const padding = parseInt(window.getComputedStyle(content).paddingTop, 10) * 2;
+        
+        content.style.maxHeight = `calc(100vh - ${headerHeight + footerHeight + padding}px)`;
+    };
+
+    adjustHeight();
+    window.addEventListener('resize', adjustHeight);
 });
