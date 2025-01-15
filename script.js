@@ -6,9 +6,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const infuraUrl = 'https://mainnet.infura.io/v3/9f3245fc6233454e8dbe7f730f466324'; // Replace with your Infura project ID
     let provider = new ethers.JsonRpcProvider(infuraUrl); // Initial provider uses Infura
     let contract = new ethers.Contract(contractAddress, contractABI, provider);
+    let pauseRequests = false; // Flag to pause requests
 
     // Function to fetch and display bids
     const fetchBids = async (useENS = false) => {
+        if (pauseRequests) return; // Exit if requests are paused
+
         try {
             const bidsTableBody = document.getElementById('bidsTableBody');
             const bidResponse = await contract.getBids(0, 14);
@@ -60,7 +63,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (error) {
             console.error('Error fetching bids', error);
-            alert('Failed to fetch bids: ' + error.message);
+            if (error.response && error.response.status === 403) {
+                pauseRequests = true;
+                alert('Requests are paused due to a 403 Forbidden error.');
+            } else {
+                alert('Failed to fetch bids: ' + error.message);
+            }
         }
     };
 
@@ -77,6 +85,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Function to fetch and display auction time
     const fetchAuctionTime = async () => {
+        if (pauseRequests) return; // Exit if requests are paused
+
         try {
             const auctionInfo = await contract.getAuction(0);
             const startTime = Number(auctionInfo[1]) * 1000; // Convert to milliseconds
@@ -94,6 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Update auction time every second
             setInterval(async () => {
+                if (pauseRequests) return; // Exit if requests are paused
+
                 const now = Date.now();
                 const timeLeft = endTime - now;
                 if (timeLeft > 0) {
@@ -109,7 +121,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 1000); // Update every second
         } catch (error) {
             console.error("Error fetching auction time:", error);
-            alert("An error occurred while fetching auction time. Please try again.");
+            if (error.response && error.response.status === 403) {
+                pauseRequests = true;
+                alert('Requests are paused due to a 403 Forbidden error.');
+            } else {
+                alert("An error occurred while fetching auction time. Please try again.");
+            }
         }
     };
 
