@@ -1,3 +1,5 @@
+/* Common styles for both pages */
+
 body {
     background-color: black;
     color: white;
@@ -9,29 +11,27 @@ body {
     height: 100vh;
     overflow: hidden;
     padding: 5px;
-    font-size: 12px;
     margin: 0;
+    font-size: 12px;
 }
 
-.container {
+.container, .gallery {
     background-color: #F5F5F5;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     width: 100%;
     max-width: 600px;
     min-width: 300px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    max-height: calc(100vh - 40px);
-    overflow-y: hidden;
+    max-height: calc(100vh - 20px); /* Adjusted for less padding */
 }
 
 table {
     width: 100%;
-    margin-top: 20px;
+    margin-top: 10px;
     border-collapse: collapse;
     border: none;
     min-width: 300px;
@@ -41,41 +41,45 @@ th, td {
     text-align: left;
     font-size: 12px;
     border-bottom: 1px solid white;
-    padding: 10px 20px;
+    padding: 5px 10px;
 }
 
 th {
     font-weight: bold;
 }
 
-.auction-time {
-    font-size: 1.5em;
+.auction-time, .header-bar {
+    font-size: 1.2em; /* Standardize font size */
     text-align: center;
     background-color: #E7B5A6;
     color: white;
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 5px 10px; /* Standardize padding */
+    margin-bottom: 10px; /* Standardize margin */
+    height: 40px; /* Fixed height for consistency */
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space elements across the bar */
 }
 
-.connect-wallet-btn, .gallery-btn {
+.header-bar p {
+    margin: 0; /* Remove default margin from paragraph to keep inline */
+}
+
+button {
     background-color: #E7B5A6;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1em;
-    margin-right: 10px;
-    margin-top: 20px;
     transition: background-color 0.3s;
+    margin-right: 5px;
+    margin-top: 10px;
 }
 
-.gallery-btn {
-    margin-right: 0;
-}
-
-.connect-wallet-btn:hover, .gallery-btn:hover, .submit-bid-btn:hover {
+button:hover {
     background-color: #D8A495;
 }
 
@@ -83,7 +87,7 @@ th {
     color: #D83F31;
 }
 
-/* Additional styles for the leaderboard */
+/* Adjust table columns for smaller screens */
 #bidsTable th:nth-child(1), #bidsTable td:nth-child(1) {
     width: 10%;
 }
@@ -98,7 +102,7 @@ th {
 #userInfoTable td {
     background-color: #D83F31;
     color: white;
-    padding: 10px 20px;
+    padding: 5px 10px;
 }
 
 #bidsTable {
@@ -110,38 +114,50 @@ th {
     display: none;
 }
 
-.header-bar {
-    background-color: #E7B5A6;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px 10px 0 0;
-    font-size: 1.5em;
+/* Common styles for dropdown */
+.week-selector {
     display: flex;
-    justify-content: space-between;
     align-items: center;
 }
 
-button {
-    background-color: #E7B5A6;
+.week-selector select {
+    padding: 5px;
+    background-color: #D83F31;
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 5px;
-    cursor: pointer;
     font-size: 1em;
-    transition: background-color 0.3s;
+    appearance: none;
 }
 
-button:hover {
-    background-color: #D8A495;
+.week-selector select::after {
+    content: '▼';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.week-selector select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #E7B5A6;
 }
 
 @media (max-width: 600px) {
-    .container {
-        max-height: 100vh;
-        padding: 10px;
+    .container, .gallery {
+        padding: 5px;
+        max-height: calc(100vh - 10px);
     }
-    #bidsTable {
+    table, th, td {
         font-size: 10px;
+    }
+    .auction-time, .header-bar {
+        font-size: 1em;
+        height: 30px; /* Smaller height for mobile */
+    }
+    button {
+        font-size: 0.8em;
+        padding: 3px 5px;
     }
 }
