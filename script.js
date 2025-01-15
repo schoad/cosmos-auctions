@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Function to fetch and display bids
-    const fetchBids = async (useENS = false) => {
+    const fetchBids = async (useENS = true) => {
         try {
             // Use the global selectedWeek here
             const weekIndex = selectedWeek - 1; // Convert to 0-based index
@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const weekIndex = selectedWeek - 1; // Convert to 0-based index
             const userBid = await makeRequest(contract.getBidForUser, weekIndex, account);
             document.getElementById('userBid').innerText = ethers.formatEther(userBid.amount);
+            
         } catch (error) {
             console.error("Error fetching user's bid:", error);
             if (error.message.includes('no auction')) {
@@ -216,6 +217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const web3Provider = new ethers.BrowserProvider(window.ethereum);
                 const signer = await web3Provider.getSigner();
                 const contractWithSigner = contract.connect(signer);
+                let accountENS = null;
         
                 // Update provider and contract after wallet connection
                 provider = web3Provider;
@@ -234,8 +236,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         
                 if (account && typeof account === 'string') {
                     // Display the wallet address
-                    document.getElementById('walletAddressDisplay').innerText = account.slice(0, 6) + '...' + account.slice(-4);
-        
+
+                    accountENS = await provider.lookupAddress(account);
+                    if(accountENS !== null) {
+                        document.getElementById('walletAddressDisplay').innerText = accountENS;
+                    } else {
+                        document.getElementById('walletAddressDisplay').innerText = account.slice(0, 6) + '...' + account.slice(-4);
+                    }
+                                            
                     // Fetch user's bid using the connected wallet
                     await fetchUserBid(account);
         
