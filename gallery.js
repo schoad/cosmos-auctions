@@ -4,6 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const fullScreenImage = document.getElementById('fullScreenImage');
     const weekSelect = document.getElementById('weekSelect');
 
+    // Prevent double-tap zoom on iOS
+    document.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.target.click();
+    }, false);
+
     // Function to set the number of columns
     const setColumns = (columns) => {
         gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
