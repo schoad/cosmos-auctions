@@ -9,7 +9,7 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    overflow: hidden;
+    overflow: auto;
     padding: 5px;
     margin: 0;
     font-size: 12px;
@@ -26,6 +26,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: auto;
     max-height: calc(100vh - 20px); /* Adjusted for less padding */
 }
 

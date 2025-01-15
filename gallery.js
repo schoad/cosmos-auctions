@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event listener for toggle switch
     toggleSwitch.addEventListener('change', () => {
-        setColumns(toggleSwitch.checked ? 2 : 3); // Changed logic here
+        setColumns(toggleSwitch.checked ? 5 : 3); // Changed logic here
         refreshGallery(); // Refresh the gallery when changing columns
     });
 
@@ -25,11 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const adjustForWindowSize = () => {
         const width = window.innerWidth;
         if (width < 601) {
-            setColumns(1);
+            setColumns(3);
         } else if (width < 901) {
-            setColumns(2);
+            setColumns(4);
         } else {
-            setColumns(toggleSwitch.checked ? 2 : 3); // Changed default to 3
+            setColumns(toggleSwitch.checked ? 5 : 3); // Changed default to 3
         }
         refreshGallery(); // Refresh the gallery when resizing
     };
@@ -113,6 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const availableHeight = window.innerHeight - headerHeight - footerHeight - galleryPadding;
         
         gallery.style.maxHeight = `${availableHeight}px`;
+        gallery.style.overflow = 'auto';
+
     }
 
     // Event listener for week selection - no need for parseInt since values are strings
