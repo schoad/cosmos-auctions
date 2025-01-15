@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFT Gallery</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: black; /* Changed background color to black */
+            color: white; /* Changed text color to white for visibility */
+        }
+        .gallery {
+            padding: 20px;
+            max-width: 1000px; /* Optional: Limit the gallery width */
+            margin: 0 auto; /* Center the gallery */
+        }
+        .nft-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Default to 2 columns */
+            gap: 10px;
+            max-height: calc(100vh - 150px); /* Adjust based on header and footer heights */
+            overflow-y: auto; /* Use auto for better scroll behavior */
+            scrollbar-width: thin; /* Show thin scrollbar for Firefox */
+            scrollbar-color: #888 transparent; /* Scrollbar color */
+        }
+        .nft-gallery::-webkit-scrollbar {
+            width: 8px; /* Width of the scrollbar */
+        }
+        .nft-gallery::-webkit-scrollbar-thumb {
+            background-color: #888; /* Color of the scrollbar thumb */
+            border-radius: 4px;
+        }
+        .nft-gallery img {
+            width: 100%;
+            height: auto;
+            object-fit: cover; /* Ensure images maintain aspect ratio */
+        }
+        .toggle-switch {
+            margin-bottom: 20px;
+            width: 60px;
+            height: 34px;
+            position: relative;
+            display: inline-block;
+        }
+        .toggle-switch input {
+            display: none;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        /* Responsive design for smaller screens */
+        @media (max-width: 600px) {
+            .nft-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Additional responsive design */
+        @media (min-width: 601px) and (max-width: 900px) {
+            .nft-gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery">
+        <h2>Newly Minted NFTs</h2>
+        <label class="toggle-switch">
+            <input type="checkbox" id="columnToggle">
+            <span class="slider"></span>
+        </label>
+        <div id="nftGallery" class="nft-gallery"></div>
+        <button class="back-btn" onclick="location.href='index.html'">Back to Auction</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gallery = document.getElementById('nftGallery');
+            const toggleSwitch = document.getElementById('columnToggle');
+
+            // Function to set the number of columns
+            const setColumns = (columns) => {
+                gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+            };
+
+            // Event listener for toggle switch
+            toggleSwitch.addEventListener('change', () => {
+                setColumns(toggleSwitch.checked ? 3 : 2);
+            });
+
+            // Function to adjust column count based on window size
+            const adjustForWindowSize = () => {
+                const width = window.innerWidth;
+                if (width < 601) {
+                    setColumns(1);
+                } else if (width < 901) {
+                    setColumns(2);
+                } else {
+                    setColumns(toggleSwitch.checked ? 3 : 2);
+                }
+            };
+
+            // Adjust columns when window is resized
+            window.addEventListener('resize', adjustForWindowSize);
+
+            // Initial call to set columns based on current window size
+            adjustForWindowSize();
+
+            // Add images to the gallery in descending order of token IDs
+            for (let tokenId = 229; tokenId >= 216; tokenId--) {
+                const img = document.createElement('img');
+                img.src = `src/images/small/cosmos_${tokenId}_small.png`;
+                img.alt = `NFT ${tokenId}`;
+                img.onerror = function() {
+                    this.src = `src/images/small/cosmos_${tokenId}_small.gif`;
+                };
+                gallery.appendChild(img);
+            }
+        });
+    </script>
+</body>
+</html>
