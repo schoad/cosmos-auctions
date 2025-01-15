@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const gallery = document.getElementById('nftGallery');
     const toggleSwitch = document.getElementById('columnToggle');
     const fullScreenImage = document.getElementById('fullScreenImage');
+    const weekSelect = document.getElementById('weekSelect');
 
     // Function to set the number of columns
     const setColumns = (columns) => {
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener for toggle switch
     toggleSwitch.addEventListener('change', () => {
         setColumns(toggleSwitch.checked ? 3 : 2);
+        refreshGallery(); // Refresh the gallery when changing columns
     });
 
     // Function to adjust column count based on window size
@@ -23,26 +25,51 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             setColumns(toggleSwitch.checked ? 3 : 2);
         }
+        refreshGallery(); // Refresh the gallery when resizing
     };
 
-    // Adjust columns when window is resized
-    window.addEventListener('resize', adjustForWindowSize);
+    // Function to display images based on selected week
+    function refreshGallery() {
+        const selectedWeek = parseInt(weekSelect.value);
+        const startTokenId = (selectedWeek - 1) * 14 + 216; // Adjust start based on week
+        const endTokenId = startTokenId + 13;
 
-    // Initial call to set columns based on current window size
-    adjustForWindowSize();
+        // Clear existing images
+        gallery.innerHTML = '';
+        gallery.style.display = 'block'; // Reset display for single image
+        gallery.style.overflow = 'hidden'; // Prevent scrolling
 
-    // Add images to the gallery in descending order of token IDs
-    for (let tokenId = 229; tokenId >= 216; tokenId--) {
-        const img = document.createElement('img');
-        img.src = `src/images/small/cosmos_${tokenId}_small.png`;
-        img.alt = `NFT ${tokenId}`;
-        img.onerror = function() {
-            this.src = `src/images/small/cosmos_${tokenId}_small.gif`;
-        };
-        img.addEventListener('click', function() {
-            displayFullScreenImage(tokenId);
-        });
-        gallery.appendChild(img);
+        if (selectedWeek === 1) { // Only Week 1 has available images
+            gallery.style.display = 'grid'; // Revert to grid for multiple images
+            gallery.style.height = 'auto'; // Let it adjust to content
+            for (let tokenId = startTokenId; tokenId <= endTokenId; tokenId++) {
+                const img = document.createElement('img');
+                img.src = `src/images/small/cosmos_${tokenId}_small.png`;
+                img.alt = `NFT ${tokenId}`;
+                img.onerror = function() {
+                    this.src = `src/images/small/cosmos_${tokenId}_small.gif`;
+                };
+                img.addEventListener('click', function() {
+                    displayFullScreenImage(tokenId);
+                });
+                gallery.appendChild(img);
+            }
+        } else {
+            // For all other weeks, show a single centered "not eligible" image
+            const img = document.createElement('img');
+            img.src = 'src/images/cosmos_not_eligible.gif';
+            img.alt = 'NFTs not available for this week';
+            img.style.display = 'block';
+            img.style.margin = 'auto';
+            img.style.maxHeight = 'calc(100vh - 140px)'; // Adjust based on your layout
+            img.style.maxWidth = '100%';
+            gallery.appendChild(img);
+            
+            // Adjust gallery height to fit the image without scrolling
+            gallery.style.height = `${img.clientHeight}px`;
+        }
+
+        adjustGalleryHeight();
     }
 
     // Function to display full screen image
@@ -70,16 +97,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to adjust height dynamically
-    const adjustHeight = () => {
+    // Adjust gallery height dynamically based on content
+    function adjustGalleryHeight() {
         const headerHeight = document.querySelector('.header-bar').offsetHeight;
         const footerHeight = document.querySelector('.back-btn')?.offsetHeight || 0;
-        const content = document.querySelector('.gallery');
-        const padding = parseInt(window.getComputedStyle(content).paddingTop, 10) * 2;
+        const galleryPadding = parseInt(getComputedStyle(gallery).paddingTop) * 2; // Assuming top and bottom padding are equal
+        const availableHeight = window.innerHeight - headerHeight - footerHeight - galleryPadding;
         
-        content.style.maxHeight = `calc(100vh - ${headerHeight + footerHeight + padding}px)`;
-    };
+        gallery.style.maxHeight = `${availableHeight}px`;
+    }
 
-    adjustHeight();
-    window.addEventListener('resize', adjustHeight);
+    // Event listener for week selection
+    weekSelect.addEventListener('change', refreshGallery);
+
+    // Adjust columns and gallery height when window is resized
+    window.addEventListener('resize', () => {
+        adjustForWindowSize();
+        adjustGalleryHeight();
+    });
+
+    // Initial setup
+    adjustForWindowSize();
+    refreshGallery(); // Display images for the initially selected week
+
+    adjustGalleryHeight();
 });
