@@ -1,0 +1,109 @@
+/* gallery-specific styles */
+.gallery {
+    padding: 20px;
+    max-width: 1000px; /* Optional: Limit the gallery width */
+    margin: 0 auto; /* Center the gallery */
+    height: calc(100% - 40px); /* Adjust for padding and header */
+    display: flex;
+    flex-direction: column;
+}
+
+.nft-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Default to 2 columns */
+    gap: 10px;
+    max-height: calc(100% - 140px); /* Adjust for header and footer */
+    overflow-y: auto; /* Use auto for better scroll behavior */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.nft-gallery::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for WebKit browsers */
+}
+
+.nft-gallery img {
+    width: 100%;
+    height: auto;
+    object-fit: cover; /* Ensure images maintain aspect ratio */
+    cursor: pointer; /* Change cursor to indicate clickability */
+}
+
+.toggle-switch {
+    margin: 0;
+    width: 60px;
+    height: 34px;
+    position: relative;
+    display: inline-block;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #D83F31; /* Use one of the red shades */
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #D83F31; /* Use the same red shade when checked */
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.full-screen-image {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.full-screen-image img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.gallery > .nft-gallery {
+    margin-top: 10px; /* Assuming grid gap is 10px */
+    background-color: black; /* Match the background color */
+}
+
+@media (max-width: 600px) {
+    .nft-gallery {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+    .nft-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
