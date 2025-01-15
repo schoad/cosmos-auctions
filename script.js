@@ -7,14 +7,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     let provider = new ethers.JsonRpcProvider(infuraUrl); // Initial provider uses Infura
     let contract = new ethers.Contract(contractAddress, contractABI, provider);
     let pauseRequests = false; // Flag to pause requests
+    const weekSelect = document.getElementById('weekSelect');
+    const bidsContainer = document.getElementById('bidsContainer');
+    const noAuctionMessage = document.getElementById('noAuctionMessage');
+
+    // Set default to Week 1
+    weekSelect.value = '0'; // Assuming '0' is the value for Week 1
+
+    // Function to test Infura connection
+    async function testInfuraConnection() {
+        try {
+            const response = await fetch(infuraUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                pauseRequests = false;
+                console.log("Infura connection successful.");
+            } else {
+                console.error("Failed to connect to Infura. Disabling requests.");
+                pauseRequests = true;
+            }
+        } catch (error) {
+            console.error("Error during Infura connection test:", error);
+            pauseRequests = true;
+        }
+    }
+
+    // Test connection before any other operation
+    await testInfuraConnection();
+
+    // Periodic check every 60 seconds
+    setInterval(testInfuraConnection, 60000); // 60,000 ms = 60 seconds
+
+    // Wrapper for making requests, which will check if requests are allowed
+    async function makeRequest(fn, ...args) {
+        if (!pauseRequests) {
+            return fn(...args);
+        } else {
+            console.error("Requests are blocked due to failed initialization or paused.");
+            return Promise.reject(new Error("Requests are blocked"));
+        }
+    }
 
     // Function to fetch and display bids
     const fetchBids = async (useENS = false) => {
-        if (pauseRequests) return; // Exit if requests are paused
-
         try {
+            const selectedWeek = parseInt(weekSelect.value);
             const bidsTableBody = document.getElementById('bidsTableBody');
-            const bidResponse = await contract.getBids(0, 14);
+            const bidResponse = await makeRequest(contract.getBids, selectedWeek, 14);
 
             const amounts = bidResponse.amounts;
             const users = bidResponse.users;
@@ -35,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resolvedUsers = users.map(user => user.slice(0, 6) + '...' + user.slice(-4));
             }
 
-            // Update table in one go
+            // Show table, hide message
             bidsTableBody.innerHTML = ''; // Clear existing rows
             for (let i = 0; i < amounts.length; i++) {
                 const row = document.createElement('tr');
@@ -60,12 +104,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 row.appendChild(bidderCell);
                 bidsTableBody.appendChild(row);
             }
+            bidsContainer.querySelector('table').classList.remove('hidden');
+            noAuctionMessage.classList.add('hidden');
 
         } catch (error) {
             console.error('Error fetching bids', error);
-            if (error.response && error.response.status === 403) {
-                pauseRequests = true;
-                alert('Requests are paused due to a 403 Forbidden error.');
+            if (error.message.includes('no auction')) {
+                // If no auction for this period
+                bidsContainer.querySelector('table').classList.add('hidden');
+                noAuctionMessage.classList.remove('hidden');
             } else {
                 alert('Failed to fetch bids: ' + error.message);
             }
@@ -75,20 +122,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and display user's bid
     const fetchUserBid = async (account) => {
         try {
-            const userBid = await contract.getBidForUser(0, account);
+            const selectedWeek = parseInt(weekSelect.value);
+            const userBid = await makeRequest(contract.getBidForUser, selectedWeek, account);
             document.getElementById('userBid').innerText = ethers.formatEther(userBid.amount);
         } catch (error) {
             console.error("Error fetching user's bid:", error);
-            alert("An error occurred while fetching your bid. Please try again.");
+            if (error.message.includes('no auction')) {
+                document.getElementById('userBid').innerText = "No Auction";
+            } else {
+                alert("An error occurred while fetching your bid. Please try again.");
+            }
         }
     };
 
     // Function to fetch and display auction time
     const fetchAuctionTime = async () => {
-        if (pauseRequests) return; // Exit if requests are paused
-
         try {
-            const auctionInfo = await contract.getAuction(0);
+            const selectedWeek = parseInt(weekSelect.value);
+            const auctionInfo = await makeRequest(contract.getAuction, selectedWeek);
             const startTime = Number(auctionInfo[1]) * 1000; // Convert to milliseconds
             const endTime = Number(auctionInfo[2]) * 1000; // Convert to milliseconds
             const now = Date.now();
@@ -104,8 +155,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Update auction time every second
             setInterval(async () => {
-                if (pauseRequests) return; // Exit if requests are paused
-
                 const now = Date.now();
                 const timeLeft = endTime - now;
                 if (timeLeft > 0) {
@@ -121,18 +170,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 1000); // Update every second
         } catch (error) {
             console.error("Error fetching auction time:", error);
-            if (error.response && error.response.status === 403) {
-                pauseRequests = true;
-                alert('Requests are paused due to a 403 Forbidden error.');
+            if (error.message.includes('no auction')) {
+                document.getElementById('timeRemaining').innerText = "No Auction";
             } else {
                 alert("An error occurred while fetching auction time. Please try again.");
             }
         }
     };
 
-    // Initial fetch of bids and auction time using Infura
-    await fetchBids(); // Initially, we don't use ENS
-    await fetchAuctionTime();
+    // Initial fetch of bids and auction time if Infura is available
+    if (!pauseRequests) {
+        await fetchBids(); // Initially, we don't use ENS
+        await fetchAuctionTime();
+    }
+
+    // Event listener for week selection
+    weekSelect.addEventListener('change', async () => {
+        if (!pauseRequests) {
+            await fetchBids();
+            await fetchAuctionTime();
+        } else {
+            console.warn('Request paused due to Infura connection issues.');
+        }
+    });
 
     connectWalletBtn.addEventListener('click', async () => {
         if (typeof window.ethereum !== 'undefined') {
@@ -144,7 +204,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         
                 // Update provider and contract after wallet connection
                 provider = web3Provider;
-                contract = contractWithSigner;
+                contract = contractWithSigner; // Use wallet's provider for contract calls
+
+                // Reset pauseRequests to false after successful wallet connection
+                pauseRequests = false;
 
                 // Get the current account address from the signer
                 const account = await signer.getAddress();
@@ -164,8 +227,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Hide the connect wallet button after successful connection
                     connectWalletBtn.style.display = 'none';
 
-                    // Fetch bids again but now using ENS
+                    // Refresh bids with ENS names using the new provider
                     await fetchBids(true); // Pass true to use ENS lookup
+
+                    // Refresh auction time using the new provider
+                    await fetchAuctionTime();
+
                 } else {
                     console.error('Account is not a string or is undefined:', account);
                     alert('Failed to connect wallet. Please try again.');
@@ -179,4 +246,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert("Please install MetaMask or another Web3 wallet to use this feature.");
         }
     });
+
+    // Function for mobile adjustments (unchanged)
+    function adjustIndexPageForMobile() {
+        const container = document.querySelector('.container');
+        const auctionTimeHeight = document.querySelector('.auction-time').offsetHeight;
+        const buttonsHeight = document.querySelector('.connect-wallet-btn').offsetHeight + 
+                              document.querySelector('.gallery-btn').offsetHeight;
+        const padding = parseInt(getComputedStyle(container).paddingTop, 10) * 2;
+        
+        // Calculate available height for the table
+        const availableTableHeight = window.innerHeight - auctionTimeHeight - buttonsHeight - padding;
+        
+        // Adjust table max-height
+        document.getElementById('bidsTable').style.maxHeight = `${availableTableHeight}px`;
+        
+        // Adjust font size if needed
+        if (window.innerWidth <= 600) {
+            document.querySelectorAll('table, th, td').forEach(el => {
+                el.style.fontSize = '10px';
+            });
+        }
+    }
+
+    adjustIndexPageForMobile();
+    window.addEventListener('resize', adjustIndexPageForMobile);
 });

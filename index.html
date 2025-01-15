@@ -12,27 +12,43 @@
     <div class="container">
         <div class="auction-time">
             <p>Auction Timer: <span id="timeRemaining"></span></p>
+            <div class="week-selector">
+                <select id="weekSelect">
+                    <option value="0">Week - 1</option>
+                    <option value="1">Week - 2</option>
+                    <option value="2">Week - 3</option>
+                    <option value="3">Week - 4</option>
+                    <option value="4">Week - 5</option>
+                    <option value="5">Week - 6</option>
+                    <option value="6">Week - 7</option>
+                </select>
+            </div>
         </div>
-        <table id="bidsTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Bid (ETH)</th>
-                    <th>User Address</th>
-                </tr>
-            </thead>
-            <tbody id="bidsTableBody"></tbody>
-        </table>
-        <div class="user-info">
-            <table id="userInfoTable" class="hidden">
-                <tbody>
+        <div id="bidsContainer">
+            <table id="bidsTable">
+                <thead>
                     <tr>
-                        <td></td>
-                        <td id="userBid"></td>
-                        <td id="walletAddressDisplay"></td>
+                        <th>#</th>
+                        <th>Bid (ETH)</th>
+                        <th>User Address</th>
                     </tr>
-                </tbody>
+                </thead>
+                <tbody id="bidsTableBody"></tbody>
             </table>
+            <div class="user-info">
+                <table id="userInfoTable" class="hidden">
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td id="userBid"></td>
+                            <td id="walletAddressDisplay"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="noAuctionMessage" class="hidden">
+                <p>No auctions have started for this period.</p>
+            </div>
         </div>
         <button class="connect-wallet-btn" id="connectWalletBtn">Connect</button>
         <button class="gallery-btn" id="galleryBtn" onclick="location.href='gallery.html'">Gallery</button>
