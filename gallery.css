@@ -16,26 +16,52 @@
 /* Header bar optimizations */
 .header-bar {
     position: fixed;
-    top: 0;
+    top: max(20px, env(safe-area-inset-top));
     left: 0;
     width: 100%;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) 10px env(safe-area-inset-left);
-    background: #965d5d;
+    /*padding: env(safe-area-inset-top) env(safe-area-inset-right) 10px env(safe-area-inset-left);*/
+    padding: 0 20px;
+    /*background: #965d5d;*/
+    background: transparent;
     z-index: 100;
-    /* Ensure content doesn't overlap with notch/dynamic island */
-    min-height: 44px; /* iOS minimum tap target size */
+    display: flex;
+    justify-content: space-between;
+    align-items: center ,;
+}
+
+/* Style for COSMOS text to match back button */
+.header-bar p {
+    margin: 0;
+    background-color: #E7B5A6;
+    padding: 12px 24px; /* Match back button padding */
+    border-radius: 8px; /* Match back button border-radius */
+    min-height: 44px; /* Match back button height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.week-selector select {
+    padding: 12px 24px;
+    background-color: #E7B5A6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    appearance: none;
+    min-height: 44px;
 }
 
 /* Back button mobile optimizations */
 .back-btn {
     position: fixed;
-    bottom: max(20px, env(safe-area-inset-bottom));
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
-    padding: 12px 24px; /* Larger touch target */
-    min-height: 44px; /* iOS minimum tap target size */
-    min-width: 44px;
+    background-color: #E7B5A6;
+    padding: 12px 24px;
+    min-height: 44px;
     border-radius: 8px;
 }
 
@@ -73,7 +99,7 @@
 }
 
 .toggle-switch {
-    margin: 0;
+    margin-right: 20px; /* Match grid padding */
     width: 60px;
     height: 34px;
     position: relative;
@@ -91,9 +117,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #D83F31;
+    background-color: #E7B5A6;
     transition: .4s;
     border-radius: 34px;
+    min-height: 44px;
 }
 
 .slider:before {
@@ -102,7 +129,7 @@
     height: 26px;
     width: 26px;
     left: 4px;
-    bottom: 4px;
+    bottom: 9px; /* Adjust to center vertically */
     background-color: white;
     transition: .4s;
     border-radius: 50%;
