@@ -11,7 +11,8 @@
 </head>
 <body>
     <div class="container">
-        <div class="auction-time">
+        <!-- Updated header class to match gallery page -->
+        <div class="header-bar">
             <div class="week-selector">
                 <select id="weekSelect">
                     <!-- Changed value attributes to strings for consistency with gallery.html -->
@@ -24,9 +25,10 @@
                     <option value="7">Week - 7</option> -->
                 </select>
             </div>
-            <p>COSMOS Auctions</p>
+            <p>COSMOS</p>
             <p><span id="timeRemaining"></span></p>
         </div>
+        <!-- Added margin-top to account for fixed header -->
         <div id="bidsContainer">
             <table id="bidsTable">
                 <thead>
@@ -53,8 +55,10 @@
                 <p>No auctions have started for this period.</p>
             </div>
         </div>
-        <button class="connect-wallet-btn" id="connectWalletBtn">Connect</button>
-        <button class="gallery-btn" id="galleryBtn" onclick="location.href='gallery.html'">Gallery</button>
+        <div class="button-container">
+            <button class="connect-wallet-btn" id="connectWalletBtn">Connect</button>
+            <button class="gallery-btn" id="galleryBtn" onclick="location.href='gallery.html'">Gallery</button>
+        </div>
     </div>
 </body>
 </html>

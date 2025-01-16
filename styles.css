@@ -50,17 +50,42 @@ th {
 }
 
 .auction-time, .header-bar {
-    font-size: 1.2em; /* Standardize font size */
-    text-align: center;
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 600px;
     background-color: #E7B5A6;
-    color: white;
-    border-radius: 5px;
-    padding: 5px 10px; /* Standardize padding */
-    margin-bottom: 10px; /* Standardize margin */
-    height: 40px; /* Fixed height for consistency */
+    padding: 8px 20px;
+    border-radius: 8px;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.gallery-btn, .back-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background-color: #E7B5A6;
+    padding: 12px 24px;
+    height: 44px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Space elements across the bar */
+    justify-content: center;
+    box-sizing: border-box;
+    margin: 0; /* Override default button margin */
+    transition: background-color 0.3s;
+}
+
+.gallery-btn:hover, .back-btn:hover {
+    background-color: #D8A495;
 }
 
 .header-bar p {
@@ -122,15 +147,15 @@ button:hover {
 }
 
 .week-selector select {
-    padding: 12px 24px;
-    background-color: #E7B5A6;
+    background-color: transparent;
     color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
+    border: 2px solid white;
+    border-radius: 6px;
+    font-size: 0.9em;
     appearance: none;
-    height: 44px; /* Match exact height */
-    box-sizing: border-box;
+    padding: 4px 12px;
+    height: 28px;
+    cursor: pointer;
 }
 
 .week-selector select::after {
@@ -152,6 +177,24 @@ button:hover {
 .week-selector select:hover,
 .back-btn:hover {
     background-color: #D8A495;
+}
+
+.container > div:first-of-type:not(.auction-time),
+.nft-gallery {
+    margin-top: 84px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .auction-time, .header-bar {
+        width: calc(100% - 24px);
+        padding: 8px 12px;
+    }
+
+    .gallery-btn, .back-btn {
+        padding: 8px 16px;
+        height: 36px;
+    }
 }
 
 @media (max-width: 600px) {
