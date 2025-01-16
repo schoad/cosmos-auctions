@@ -74,8 +74,8 @@ input:checked + .slider:before {
     padding: 20px;
     margin-top: 20px;
     /* Adjust bottom margin to prevent overlap with button */
-    margin-bottom: 84px; /* 44px button height + 2 * 20px spacing */
-    height: calc(100dvh - 188px); /* Viewport height - (header + button + spacing) */
+    margin-bottom: 138px; /* 44px button height + 2 * 20px spacing */
+    height: calc(100dvh - 168px); /* Viewport height - (header + button + spacing) */
     -webkit-overflow-scrolling: touch;
 }
 
@@ -127,6 +127,7 @@ input:checked + .slider:before {
     width: calc(100% - 40px);
     max-width: 600px;
     z-index: 100;
+    height: 44px;
 }
 
 /* Enhanced mobile responsiveness */
@@ -156,7 +157,7 @@ input:checked + .slider:before {
 /* Portrait orientation optimizations */
 @media (orientation: portrait) {
     .nft-gallery {
-        height: calc(100dvh - 188px); /* Adjusted to account for header and button */
+        height: calc(100dvh - 128px); /* Adjusted to account for header and button */
     }
 }
 
@@ -164,6 +165,6 @@ input:checked + .slider:before {
 @media (orientation: landscape) {
     .nft-gallery {
         grid-template-columns: repeat(5, 1fr);
-        height: calc(100dvh - 188px); /* Adjusted to account for header and button */
+        height: calc(100dvh - 128px); /* Adjusted to account for header and button */
     }
 }
