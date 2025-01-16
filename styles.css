@@ -122,13 +122,15 @@ button:hover {
 }
 
 .week-selector select {
-    padding: 5px;
-    background-color: #D83F31;
+    padding: 12px 24px;
+    background-color: #E7B5A6;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 1em;
     appearance: none;
+    height: 44px; /* Match exact height */
+    box-sizing: border-box;
 }
 
 .week-selector select::after {
@@ -143,6 +145,13 @@ button:hover {
 .week-selector select:focus {
     outline: none;
     box-shadow: 0 0 0 2px #E7B5A6;
+}
+
+/* Add hover effects for consistency */
+.header-bar p:hover,
+.week-selector select:hover,
+.back-btn:hover {
+    background-color: #D8A495;
 }
 
 @media (max-width: 600px) {
