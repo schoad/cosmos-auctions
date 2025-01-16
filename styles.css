@@ -179,8 +179,7 @@ button:hover {
     background-color: #D8A495;
 }
 
-.container > div:first-of-type:not(.auction-time),
-.nft-gallery {
+.container > div:first-of-type:not(.auction-time) {
     margin-top: 84px;
 }
 

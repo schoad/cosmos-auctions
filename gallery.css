@@ -66,9 +66,9 @@ input:checked + .slider:before {
     gap: 20px;
     overflow-y: auto;
     padding: 20px;
-    margin-bottom: max(20px, env(safe-area-inset-bottom));
+    margin-top: 20px;  /* Change from 84px to match button spacing */
+    margin-bottom: 20px;  /* Add to match top spacing */
     height: auto;
-    max-height: calc(100vh - 160px);
     -webkit-overflow-scrolling: touch;
 }
 
