@@ -278,16 +278,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Function for mobile adjustments (unchanged)
+    // Function for mobile adjustments
     function adjustIndexPageForMobile() {
         const container = document.querySelector('.container');
-        const auctionTimeHeight = document.querySelector('.auction-time').offsetHeight;
-        const buttonsHeight = document.querySelector('.connect-wallet-btn').offsetHeight + 
-                              document.querySelector('.gallery-btn').offsetHeight;
+        const headerBar = document.querySelector('.header-bar');
+        const buttonContainer = document.querySelector('.button-container');
         const padding = parseInt(getComputedStyle(container).paddingTop, 10) * 2;
         
         // Calculate available height for the table
-        const availableTableHeight = window.innerHeight - auctionTimeHeight - buttonsHeight - padding;
+        const availableTableHeight = window.innerHeight - headerBar.offsetHeight - buttonContainer.offsetHeight - padding;
         
         // Adjust table max-height
         document.getElementById('bidsTable').style.maxHeight = `${availableTableHeight}px`;
