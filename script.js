@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
-    // Global retry counter and maximum retries
+    // Global variables for Infura connection management
+    let infuraCheckInterval;
     let infuraRetryCount = 0;
     const MAX_RETRIES = 3;
 
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to test Infura connection
     async function testInfuraConnection() {
         try {
-            // First check if provider is ready
+            // Check provider initialization first
             try {
                 await provider.getNetwork();
             } catch (networkError) {
@@ -33,22 +34,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pauseRequests = true;
                 return; // Don't clear interval here, let it retry
             }
-    
-            // Then check if we have a valid contract instance
+
+            // Check if we have a valid contract instance
             if (!contract || !contract.runner) {
                 console.error("Invalid contract configuration");
                 pauseRequests = true;
-                clearInterval(infuraCheckInterval);
+                if (infuraCheckInterval) {
+                    clearInterval(infuraCheckInterval);
+                }
                 return;
             }
-    
+
             // Try to call totalSupply() on the smart contract
             const result = await contract.totalSupply();
             
             if (result !== undefined) {
                 pauseRequests = false;
                 console.log("Infura connection successful. Total supply:", result.toString());
-                clearInterval(infuraCheckInterval);
+                if (infuraCheckInterval) {
+                    clearInterval(infuraCheckInterval);
+                }
             } else {
                 throw new Error("Invalid response from contract");
             }
@@ -59,16 +64,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 error?.message?.includes("rejected due to project ID settings")) {
                 console.error("Infura project ID rejected. Stopping connection attempts.");
                 pauseRequests = true;
-                clearInterval(infuraCheckInterval);
+                if (infuraCheckInterval) {
+                    clearInterval(infuraCheckInterval);
+                }
                 return;
             }
-    
+
             // Only increment retry count for non-network initialization errors
             if (!error.message.includes("failed to detect network")) {
                 infuraRetryCount++;
                 if (infuraRetryCount >= MAX_RETRIES) {
                     console.error(`Failed to connect after ${MAX_RETRIES} attempts. Stopping retries.`);
-                    clearInterval(infuraCheckInterval);
+                    if (infuraCheckInterval) {
+                        clearInterval(infuraCheckInterval);
+                    }
                 }
             }
             
@@ -76,17 +85,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Test connection before any other operation if wallet is not connected
+    // Initial connection test if wallet is not connected
     if (!isWalletConnected) {
         await testInfuraConnection();
     }
 
-    // Periodic check every 60 seconds if there's no active wallet connection
-    let infuraCheckInterval = setInterval(() => {
+    // Setup periodic check
+    infuraCheckInterval = setInterval(() => {
         if (!isWalletConnected && infuraRetryCount < MAX_RETRIES) {
             testInfuraConnection();
         } else {
-            clearInterval(infuraCheckInterval);
+            if (infuraCheckInterval) {
+                clearInterval(infuraCheckInterval);
+            }
         }
     }, 60000); // 60,000 ms = 60 seconds
 
