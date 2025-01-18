@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const weekSelect = document.getElementById('weekSelect');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
+    let auctionInterval;
 
     // Set default to Week 1
     weekSelect.value = '1'; 
@@ -151,24 +152,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and display auction time
     const fetchAuctionTime = async () => {
         try {
-            // Use the global selectedWeek here
             const weekIndex = selectedWeek - 1; // Convert to 0-based index
             const auctionInfo = await makeRequest(contract.getAuction, weekIndex);
             const startTime = Number(auctionInfo[1]) * 1000; // Convert to milliseconds
             const endTime = Number(auctionInfo[2]) * 1000; // Convert to milliseconds
             const now = Date.now();
 
-            // Calculate remaining time
-            const timeLeft = endTime - now;
-            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-            document.getElementById('timeRemaining').innerText = 
-                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            // Update auction time every second
-            setInterval(async () => {
+            const updateAuctionTime = () => {
                 const now = Date.now();
                 const timeLeft = endTime - now;
                 if (timeLeft > 0) {
@@ -179,9 +169,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 } else {
                     document.getElementById('timeRemaining').innerText = 'Auction Ended';
-                    clearInterval(this);
+                    clearInterval(auctionInterval);
                 }
-            }, 1000); // Update every second
+            };
+
+            // Clear any existing interval before setting a new one
+            if (auctionInterval) {
+                clearInterval(auctionInterval);
+            }
+
+            // Update auction time immediately and then every second
+            updateAuctionTime();
+            auctionInterval = setInterval(updateAuctionTime, 1000);
+
         } catch (error) {
             console.error("Error fetching auction time:", error);
             if (error.message.includes('no auction')) {
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
                 if (account && typeof account === 'string') {
                     // Display the wallet address
-
+        
                     accountENS = await provider.lookupAddress(account);
                     if(accountENS !== null) {
                         document.getElementById('walletAddressDisplay').innerText = accountENS;
