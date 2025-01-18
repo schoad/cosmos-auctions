@@ -5,17 +5,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const connectWalletBtn = document.getElementById('connectWalletBtn');
     const infuraUrl = 'https://mainnet.infura.io/v3/9f3245fc6233454e8dbe7f730f466324'; // Replace with your Infura project ID
     let provider = new ethers.JsonRpcProvider(infuraUrl); // Initial provider uses Infura
+    let web3Provider = null; // Global declaration for web3Provider
+    let account = null; // Global declaration for account
     let contract = new ethers.Contract(contractAddress, contractABI, provider);
     let pauseRequests = false; 
     let isWalletConnected = false; // New variable to track wallet connection
     let selectedWeek = 1; // Global declaration, initialized to 1
-    const weekSelect = document.getElementById('weekSelect');
+    const weekSelectIndex = document.getElementById('weekSelectIndex');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
 
     // Set default to Week 1
-    weekSelect.value = '1'; 
+    weekSelectIndex.value = '1'; 
 
     // Function to test Infura connection
     async function testInfuraConnection() {
@@ -132,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Function to fetch and display user's bid
-    const fetchUserBid = async (account) => {
+    const fetchUserBid = async () => {
         try {
             // Use the global selectedWeek here
             const weekIndex = selectedWeek - 1; // Convert to 0-based index
@@ -199,12 +201,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Event listener for week selection
-    weekSelect.addEventListener('change', async () => {
+    weekSelectIndex.addEventListener('change', async () => {
         if (!pauseRequests) {
             // Update the global selectedWeek when the user changes the selection
-            selectedWeek = parseInt(weekSelect.value); 
+            selectedWeek = parseInt(weekSelectIndex.value, 10); // Ensure the week value is correctly parsed
             await fetchBids();
             await fetchAuctionTime();
+            if (isWalletConnected) {
+                await fetchUserBid(); // Use global account
+            }
         } else {
             console.warn('Request paused due to Infura connection issues.');
         }
@@ -214,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof window.ethereum !== 'undefined') {
             try {
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const web3Provider = new ethers.BrowserProvider(window.ethereum);
+                web3Provider = new ethers.BrowserProvider(window.ethereum); // Assign to global web3Provider
                 const signer = await web3Provider.getSigner();
                 const contractWithSigner = contract.connect(signer);
                 let accountENS = null;
@@ -230,7 +235,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isWalletConnected = true;
 
                 // Get the current account address from the signer
-                const account = await signer.getAddress();
+                account = await signer.getAddress(); // Assign to global account
         
                 console.log('Account:', account, typeof account);
         
@@ -245,7 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                                             
                     // Fetch user's bid using the connected wallet
-                    await fetchUserBid(account);
+                    await fetchUserBid();
         
                     // Show the user info table
                     document.getElementById('userInfoTable').classList.remove('hidden');

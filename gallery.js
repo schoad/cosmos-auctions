@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const gallery = document.getElementById('nftGallery');
     const toggleSwitch = document.getElementById('columnToggle');
     const fullScreenImage = document.getElementById('fullScreenImage');
-    const weekSelect = document.getElementById('weekSelect');
+    const weekSelectGallery = document.getElementById('weekSelectGallery');
 
     // Prevent double-tap zoom on iOS
     document.addEventListener('touchend', (e) => {
@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to display images based on selected week
     function refreshGallery() {
-        // Change: Since weekSelect values are now strings, we remove the parseInt call
-        const selectedWeek = weekSelect.value;
+        // Change: Since weekSelectGallery values are now strings, we remove the parseInt call
+        const selectedWeek = weekSelectGallery.value;
         // Adjust calculation for token IDs since weeks are now string values
         const startTokenId = (parseInt(selectedWeek) - 1) * 14 + 216; // Adjust start based on week
         const endTokenId = startTokenId + 13;
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listener for week selection - no need for parseInt since values are strings
-    weekSelect.addEventListener('change', refreshGallery);
+    weekSelectGallery.addEventListener('change', refreshGallery);
 
     // Adjust columns and gallery height when window is resized
     window.addEventListener('resize', () => {
