@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
+    // Global retry counter and maximum retries
+    let infuraRetryCount = 0;
+    const MAX_RETRIES = 3;
 
     // Set default to Week 1
     weekSelectIndex.value = '1'; 
@@ -22,22 +25,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to test Infura connection
     async function testInfuraConnection() {
         try {
-            const response = await fetch(infuraUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                pauseRequests = false;
-                console.log("Infura connection successful.");
-            } else {
-                console.error("Failed to connect to Infura. Disabling requests.");
+            // First check if provider is ready
+            try {
+                await provider.getNetwork();
+            } catch (networkError) {
+                console.error("Provider not ready:", networkError.message);
                 pauseRequests = true;
+                return; // Don't clear interval here, let it retry
+            }
+    
+            // Then check if we have a valid contract instance
+            if (!contract || !contract.runner) {
+                console.error("Invalid contract configuration");
+                pauseRequests = true;
+                clearInterval(infuraCheckInterval);
+                return;
+            }
+    
+            // Try to call totalSupply() on the smart contract
+            const result = await contract.totalSupply();
+            
+            if (result !== undefined) {
+                pauseRequests = false;
+                console.log("Infura connection successful. Total supply:", result.toString());
+                clearInterval(infuraCheckInterval);
+            } else {
+                throw new Error("Invalid response from contract");
             }
         } catch (error) {
             console.error("Error during Infura connection test:", error);
+            
+            if (error?.error?.message === "rejected due to project ID settings" || 
+                error?.message?.includes("rejected due to project ID settings")) {
+                console.error("Infura project ID rejected. Stopping connection attempts.");
+                pauseRequests = true;
+                clearInterval(infuraCheckInterval);
+                return;
+            }
+    
+            // Only increment retry count for non-network initialization errors
+            if (!error.message.includes("failed to detect network")) {
+                infuraRetryCount++;
+                if (infuraRetryCount >= MAX_RETRIES) {
+                    console.error(`Failed to connect after ${MAX_RETRIES} attempts. Stopping retries.`);
+                    clearInterval(infuraCheckInterval);
+                }
+            }
+            
             pauseRequests = true;
         }
     }
@@ -49,10 +83,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Periodic check every 60 seconds if there's no active wallet connection
     let infuraCheckInterval = setInterval(() => {
-        if (!isWalletConnected) {
+        if (!isWalletConnected && infuraRetryCount < MAX_RETRIES) {
             testInfuraConnection();
         } else {
-            clearInterval(infuraCheckInterval); // Stop checking if wallet is connected
+            clearInterval(infuraCheckInterval);
         }
     }, 60000); // 60,000 ms = 60 seconds
 
