@@ -22,21 +22,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function fetchBids() {
         try {
             const weekIndex = selectedWeek - 1;
-            const response = await fetch(`https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex + 1}.json`);
+            const response = await fetch(`https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex}.json`);
+            
+            if (!response.ok) {
+                throw new Error('No data for this week');
+            }
+    
             const data = await response.json();
             
-            const processedBids = data.map((bid, index) => ({
-                amount: bid.amount,
-                user: bid.user,
-                rawAddress: bid.user // Assuming user is already an address or ENS name
+            const processedBids = data.bids.amounts.map((amount, index) => ({
+                amount: amount,
+                user: data.bids.users[index],
+                rawAddress: data.bids.users[index]
             }));
-
+    
             Cache.bids.set(weekIndex, processedBids);
             await updateBidsTable(processedBids);
+            noAuctionMessage.classList.add('hidden'); // Hide no auction message if data was fetched successfully
         } catch (error) {
-            console.error('Error fetching bids', error);
+            console.error('Error fetching bids:', error);
             bidsContainer.querySelector('table').classList.add('hidden');
             noAuctionMessage.classList.remove('hidden');
+            noAuctionMessage.textContent = 'No auctions have started for this period.';
         }
     }
 
@@ -115,8 +122,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const fetchAuctionTime = async () => {
         try {
             const weekIndex = selectedWeek - 1;
-            const response = await fetch(`https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex + 1}.json`);
+            const response = await fetch(`https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex}.json`);
+            
+            if (!response.ok) {
+                throw new Error('No data for this week');
+            }
+    
             const data = await response.json();
+            if (!data.auction || !data.auction.endTime) {
+                throw new Error('Auction time data not available');
+            }
+    
             const endTime = data.auction.endTime * 1000; // Convert Unix timestamp to milliseconds
             
             const updateAuctionTime = () => {
@@ -143,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
         } catch (error) {
             console.error("Error fetching auction time from JSON:", error);
-            document.getElementById('timeRemaining').innerText = "Error fetching auction time";
+            document.getElementById('timeRemaining').innerText = "No Auction";
         }
     };
 
