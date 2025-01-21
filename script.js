@@ -9,32 +9,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     let account = null;
     let contract = null;
     let isWalletConnected = false;
-    let selectedWeek = 1;
+    let selectedWeek = 2;
     const weekSelectIndex = document.getElementById('weekSelectIndex');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
 
-    // Set default to Week 1
-    weekSelectIndex.value = '1';
+    // Set default to Week 2
+    weekSelectIndex.value = '2';
 
     // Fetch bids from GitHub
     async function fetchBids() {
         try {
             const weekIndex = selectedWeek - 1;
-            const response = await fetch(`https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex}.json`);
+            const url = `https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex}.json`;
+            console.log(`Fetching data from: ${url}`);
+            const response = await fetch(url);
             
             if (!response.ok) {
                 throw new Error('No data for this week');
             }
     
             const data = await response.json();
-            
-            const processedBids = data.bids.amounts.map((amount, index) => ({
-                amount: amount,
-                user: data.bids.users[index],
-                rawAddress: data.bids.users[index]
-            }));
+            console.log(`Fetched data for week ${selectedWeek}:`, data);
+
+            let processedBids;
+            if (Array.isArray(data.bids.users)) {
+                // New format with user objects
+                processedBids = data.bids.amounts.map((amount, index) => ({
+                    amount: amount,
+                    user: data.bids.users[index].ensName || data.bids.users[index].address,
+                    rawAddress: data.bids.users[index].address
+                }));
+            } else {
+                // Old format
+                processedBids = data.bids.amounts.map((amount, index) => ({
+                    amount: amount,
+                    user: data.bids.users[index],
+                    rawAddress: data.bids.users[index]
+                }));
+            }
     
             Cache.bids.set(weekIndex, processedBids);
             await updateBidsTable(processedBids);
@@ -63,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             bidRankCell.innerText = i + 1;
             bidAmountCell.innerText = amount; // Assuming amount is already in the format you need
-            bidderCell.innerText = user; // User is now either ENS or address from JSON
+            bidderCell.innerText = user; // Display ENS or address from JSON
 
             row.appendChild(bidRankCell);
             row.appendChild(bidAmountCell);

@@ -5,31 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COSMOS</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Added config.js for configuration settings -->
     <script type="module" src="config.js"></script>
     <script type="module" src="caching.js"></script>
     <script type="module" src="script.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Updated header class to match gallery page -->
         <div class="header-bar">
             <div class="week-selector">
                 <select id="weekSelectIndex">
-                    <!-- Changed value attributes to strings for consistency with gallery.html -->
                     <option value="1">Week - 1</option>
                     <option value="2">Week - 2</option>
-                    <!--<option value="3">Week - 3</option>
-                    <option value="4">Week - 4</option>
-                    <option value="5">Week - 5</option>
-                    <option value="6">Week - 6</option>
-                    <option value="7">Week - 7</option> -->
                 </select>
             </div>
             <p>COSMOS</p>
             <p><span id="timeRemaining"></span></p>
         </div>
-        <!-- Added margin-top to account for fixed header -->
+        <div id="auction-details"></div>
         <div id="bidsContainer">
             <table id="bidsTable">
                 <thead>
