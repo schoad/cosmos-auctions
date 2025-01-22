@@ -22,7 +22,7 @@
     width: 46px;
     height: 28px;
     position: relative;
-    display: flex;
+    display: none;
     align-items: center;
 }
 
