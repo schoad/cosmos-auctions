@@ -62,7 +62,7 @@ th {
     border-radius: 8px;
     z-index: 100;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around; /* Change from space-between to space-around */
     align-items: center;
     box-sizing: border-box;
     height: 44px;
@@ -160,13 +160,13 @@ button:hover {
 #bidsTable th:nth-child(2),
 #bidsTable td:nth-child(2),
 #userInfoTable td:nth-child(2) {
-    width: 15%;
+    width: 10%;
 }
 
 #bidsTable th:nth-child(3),
 #bidsTable td:nth-child(3),
 #userInfoTable td:nth-child(3) {
-    width: 80%;
+    width: 85%;
 }
 
 /* Style for highlighting the user's bid */
@@ -235,9 +235,8 @@ button:hover {
 
 #timeRemaining {
     order: 3; /* Position time remaining on the right */
-    flex-grow: 0;
-    min-width: 80px; /* Adjust based on the longest expected time format */
-    text-align: right; /* Align text to the right, since it's meant to be on the right side */
+    flex-grow: 1; /* Allow timeRemaining to take up available space */
+    text-align: center; /* Center text within timeRemaining */
 }
 
 /* Responsive adjustments */
@@ -248,7 +247,7 @@ button:hover {
         font-size: 1em;
         margin: 20px 0;
         flex-wrap: nowrap; /* Prevent wrapping */
-        justify-content: space-between;
+        justify-content: center; /* Center all content in the header-bar */
     }
 
     .button-container {
