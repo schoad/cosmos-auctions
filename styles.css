@@ -71,7 +71,7 @@ th {
 
 .button-container {
     position: fixed;
-    bottom: 20px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
@@ -80,6 +80,7 @@ th {
     align-items: center;
     width: calc(100% - 40px);
     max-width: 600px;
+    margin-bottom: 10px; /* Consistent bottom spacing */
 }
 
 .connect-wallet-btn,
@@ -94,7 +95,7 @@ th {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    margin: 10px 0; /* Ensure consistent spacing */
+    margin: 0 0 10px 0;
     transition: background-color 0.3s;
     font-size: 12px;
     cursor: pointer;
