@@ -154,19 +154,19 @@ button:hover {
 #bidsTable th:nth-child(1),
 #bidsTable td:nth-child(1),
 #userInfoTable td:nth-child(1) {
-    width: 10%;
+    width: 5%;
 }
 
 #bidsTable th:nth-child(2),
 #bidsTable td:nth-child(2),
 #userInfoTable td:nth-child(2) {
-    width: 30%;
+    width: 10%;
 }
 
 #bidsTable th:nth-child(3),
 #bidsTable td:nth-child(3),
 #userInfoTable td:nth-child(3) {
-    width: 60%;
+    width: 85%;
 }
 
 /* Style for highlighting the user's bid */
