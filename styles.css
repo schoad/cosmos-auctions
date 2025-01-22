@@ -50,7 +50,7 @@ th {
     font-weight: bold;
 }
 
-.auction-time, .header-bar {
+.header-bar {
     position: fixed;
     top: 0;
     left: 50%;
@@ -62,7 +62,7 @@ th {
     border-radius: 8px;
     z-index: 100;
     display: flex;
-    justify-content: space-around; /* Change from space-between to space-around */
+    justify-content: space-between; /* Center all content in the header-bar */
     align-items: center;
     box-sizing: border-box;
     height: 44px;
@@ -71,7 +71,7 @@ th {
 
 .button-container {
     position: fixed;
-    bottom: 20px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
@@ -80,9 +80,11 @@ th {
     align-items: center;
     width: calc(100% - 40px);
     max-width: 600px;
+    margin-bottom: 10px; /* Consistent bottom spacing */
 }
 
-.connect-wallet-btn {
+.connect-wallet-btn,
+.gallery-btn {
     position: relative;
     width: 100%;
     background-color: #E7B5A6;
@@ -160,13 +162,13 @@ button:hover {
 #bidsTable th:nth-child(2),
 #bidsTable td:nth-child(2),
 #userInfoTable td:nth-child(2) {
-    width: 10%;
+    width: 15%;
 }
 
 #bidsTable th:nth-child(3),
 #bidsTable td:nth-child(3),
 #userInfoTable td:nth-child(3) {
-    width: 85%;
+    width: 80%;
 }
 
 /* Style for highlighting the user's bid */
@@ -185,12 +187,14 @@ button:hover {
     display: none;
 }
 
-/* Common styles for dropdown */
 .week-selector {
     order: 2; /* Place week selector in the middle */
     display: flex;
     align-items: center;
+    justify-content: center; /* Center content */
     margin: 0 auto; /* Center the week selector */
+    width: 90px; /* Fixed width */
+    position: relative;
 }
 
 .week-selector select {
@@ -202,6 +206,7 @@ button:hover {
     appearance: none;
     padding: 4px 12px;
     height: 28px;
+    width: 100%; /* Ensure the select takes full width of the parent */
     cursor: pointer;
 }
 
@@ -235,11 +240,10 @@ button:hover {
 
 #timeRemaining {
     order: 3; /* Position time remaining on the right */
-    flex-grow: 1; /* Allow timeRemaining to take up available space */
     text-align: center; /* Center text within timeRemaining */
+    min-width: 80px; /* Adjust based on the longest expected time format */
 }
 
-/* Responsive adjustments */
 @media (max-width: 600px) {
     .auction-time, .header-bar {
         width: calc(100% - 24px);
