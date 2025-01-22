@@ -34,19 +34,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log(`Fetched data for week ${selectedWeek}:`, data);
 
             let processedBids;
-            if (Array.isArray(data.bids.users)) {
+            if (typeof data.bids.users[0] === 'string') {
+                // Old format with user addresses as strings
+                processedBids = data.bids.amounts.map((amount, index) => ({
+                    amount: amount,
+                    user: data.bids.users[index],
+                    rawAddress: data.bids.users[index]
+                }));
+            } else {
                 // New format with user objects
                 processedBids = data.bids.amounts.map((amount, index) => ({
                     amount: amount,
                     user: data.bids.users[index].ensName || data.bids.users[index].address,
                     rawAddress: data.bids.users[index].address
-                }));
-            } else {
-                // Old format
-                processedBids = data.bids.amounts.map((amount, index) => ({
-                    amount: amount,
-                    user: data.bids.users[index],
-                    rawAddress: data.bids.users[index]
                 }));
             }
     
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             bidRankCell.innerText = i + 1;
             bidAmountCell.innerText = amount; // Assuming amount is already in the format you need
-            bidderCell.innerText = user; // Display ENS or address from JSON
+            bidderCell.innerText = user || "undefined"; // Display ENS or address from JSON
 
             row.appendChild(bidRankCell);
             row.appendChild(bidAmountCell);
