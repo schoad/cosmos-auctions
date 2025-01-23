@@ -36,18 +36,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to display images based on selected week
     function refreshGallery() {
-        // Change: Since weekSelectGallery values are now strings, we remove the parseInt call
         const selectedWeek = weekSelectGallery.value;
-        // Adjust calculation for token IDs since weeks are now string values
-        const startTokenId = (parseInt(selectedWeek) - 1) * 14 + 216; // Adjust start based on week
-        const endTokenId = startTokenId + 13;
+        let startTokenId, endTokenId;
+
+        switch (selectedWeek) {
+            case 'all':
+                startTokenId = 1;
+                endTokenId = 215;
+                break;
+            case 'team':
+                startTokenId = 1;
+                endTokenId = 12;
+                break;
+            case 'gift':
+                startTokenId = 13;
+                endTokenId = 54;
+                break;
+            case 'burn':
+                startTokenId = 55;
+                endTokenId = 213;
+                break;
+            case 'week-1':
+                startTokenId = 216;
+                endTokenId = 229;
+                break;
+            case 'week-2':
+                startTokenId = 230;
+                endTokenId = 243;
+                break;
+            case 'week-3':
+                startTokenId = 244;
+                endTokenId = 257;
+                break;
+            default:
+                startTokenId = 1;
+                endTokenId = 215;
+        }
 
         // Clear existing images
         gallery.innerHTML = '';
         gallery.style.display = 'block'; // Reset display for single image
         gallery.style.overflow = 'hidden'; // Prevent scrolling
 
-        if (selectedWeek === '1') { // Only Week 1 has available images
+        if (selectedWeek === 'all' || selectedWeek === 'team' || selectedWeek === 'gift' || selectedWeek === 'burn' || selectedWeek === 'week-1') {
             gallery.style.display = 'grid'; // Revert to grid for multiple images
             gallery.style.height = 'auto'; // Let it adjust to content
             for (let tokenId = startTokenId; tokenId <= endTokenId; tokenId++) {
