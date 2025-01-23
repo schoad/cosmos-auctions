@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
                 throw new Error('No data for this week');
             }
-    
+
             const data = await response.json();
             console.log(`Fetched data for week ${selectedWeek}:`, data);
 
@@ -49,8 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     rawAddress: data.bids.users[index].address
                 }));
             }
-    
-            Cache.bids.set(weekIndex, processedBids);
+
             await updateBidsTable(processedBids);
             noAuctionMessage.classList.add('hidden'); // Hide no auction message if data was fetched successfully
         } catch (error) {
@@ -141,12 +140,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
                 throw new Error('No data for this week');
             }
-    
+
             const data = await response.json();
             if (!data.auction || !data.auction.endTime) {
                 throw new Error('Auction time data not available');
             }
-    
+
             const endTime = data.auction.endTime * 1000; // Convert Unix timestamp to milliseconds
             
             const updateAuctionTime = () => {
@@ -163,14 +162,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     clearInterval(auctionInterval);
                 }
             };
-    
+
             if (auctionInterval) {
                 clearInterval(auctionInterval);
             }
-    
+
             updateAuctionTime();
             auctionInterval = setInterval(updateAuctionTime, 1000);
-    
+
         } catch (error) {
             console.error("Error fetching auction time from JSON:", error);
             document.getElementById('timeRemaining').innerText = "No Auction";
@@ -180,7 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listener for week selection
     weekSelectIndex.addEventListener('change', async () => {
         selectedWeek = parseInt(weekSelectIndex.value, 10);
-        Cache.bids.data.delete(selectedWeek - 1); // Clear cache for new week
         await fetchBids();
         await fetchAuctionTime();
         if (isWalletConnected) {
