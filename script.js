@@ -182,7 +182,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to fetch and check for data updates
     async function checkForUpdates() {
         try {
-            const response = await fetch('https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/index.json');
+            const url = `https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/index.json?timestamp=${new Date().getTime()}`;
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Error fetching index.json');
             }
