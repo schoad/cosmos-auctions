@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set default to Week 3
     weekSelectIndex.value = '3';
 
+    // Global variable to keep track of the last update time
+    window.lastUpdateTime = new Date(0); // Initialize to a very old date
+
     // Fetch bids from GitHub
     async function fetchBids() {
         try {
@@ -175,6 +178,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('timeRemaining').innerText = "No Auction";
         }
     };
+
+    // Function to fetch and check for data updates
+    async function checkForUpdates() {
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/index.json');
+            if (!response.ok) {
+                throw new Error('Error fetching index.json');
+            }
+
+            const indexData = await response.json();
+            const lastUpdated = new Date(indexData.lastUpdated);
+
+            // Check if data has been updated
+            if (lastUpdated > window.lastUpdateTime) {
+                window.lastUpdateTime = lastUpdated;
+                await fetchBids();  // Refresh the bids data
+                await fetchAuctionTime();  // Refresh the auction time
+            }
+        } catch (error) {
+            console.error('Error checking for updates:', error);
+        }
+    }
+
+    // Set an interval to check for updates every 15 seconds
+    setInterval(checkForUpdates, 15000);
 
     // Event listener for week selection
     weekSelectIndex.addEventListener('change', async () => {
