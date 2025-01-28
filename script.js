@@ -9,14 +9,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let account = null;
     let contract = null;
     let isWalletConnected = false;
-    let selectedWeek = 2;
+    let selectedWeek = 3;
     const weekSelectIndex = document.getElementById('weekSelectIndex');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
 
-    // Set default to Week 2
-    weekSelectIndex.value = '2';
+    // Set default to Week 3
+    weekSelectIndex.value = '3';
 
     // Fetch bids from GitHub
     async function fetchBids() {
