@@ -36,8 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Check if data has been updated
             if (lastUpdated > window.lastUpdateTime) {
                 window.lastUpdateTime = lastUpdated;
-                await fetchBids();  // Refresh the bids data
-                await fetchAuctionTime();  // Refresh the auction time
+                await fetchWeekData();  // Refresh the bids and auction time data
             }
         } catch (error) {
             console.error('Error checking for updates:', error);
@@ -47,8 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set an interval to check for updates every 15 seconds
     setInterval(checkForUpdates, 15000);
 
-    // Fetch bids from GitHub
-    async function fetchBids() {
+    // Fetch week data from GitHub
+    async function fetchWeekData() {
         try {
             const weekIndex = selectedWeek - 1;
             const url = `https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex}.json?timestamp=${new Date().getTime()}`;
@@ -62,6 +61,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await response.json();
             console.log(`Fetched data for week ${selectedWeek}:`, data);
 
+            await updateBids(data);
+            await updateAuctionTime(data);
+        } catch (error) {
+            console.error('Error fetching week data:', error);
+            bidsContainer.querySelector('table').classList.add('hidden');
+            noAuctionMessage.classList.remove('hidden');
+            noAuctionMessage.textContent = 'No auctions have started for this period.';
+        }
+    }
+
+    // Separate function to update bids
+    async function updateBids(data) {
+        try {
             let processedBids;
             if (typeof data.bids.users[0] === 'string') {
                 // Old format with user addresses as strings
@@ -82,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await updateBidsTable(processedBids);
             noAuctionMessage.classList.add('hidden'); // Hide no auction message if data was fetched successfully
         } catch (error) {
-            console.error('Error fetching bids:', error);
+            console.error('Error updating bids:', error);
             bidsContainer.querySelector('table').classList.add('hidden');
             noAuctionMessage.classList.remove('hidden');
             noAuctionMessage.textContent = 'No auctions have started for this period.';
@@ -116,6 +128,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         bidsTableBody.appendChild(fragment);
         bidsContainer.querySelector('table').classList.remove('hidden');
         noAuctionMessage.classList.add('hidden');
+    }
+
+    // Function to fetch and display auction time
+    async function updateAuctionTime(data) {
+        try {
+            if (!data.auction || !data.auction.endTime) {
+                throw new Error('Auction time data not available');
+            }
+
+            const endTime = data.auction.endTime * 1000; // Convert Unix timestamp to milliseconds
+            
+            const updateAuctionTime = () => {
+                const now = Date.now();
+                const timeLeft = endTime - now;
+                if (timeLeft > 0) {
+                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    document.getElementById('timeRemaining').innerText = 
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    document.getElementById('timeRemaining').innerText = 'Auction Ended';
+                    clearInterval(auctionInterval);
+                }
+            };
+
+            if (auctionInterval) {
+                clearInterval(auctionInterval);
+            }
+
+            updateAuctionTime();
+            auctionInterval = setInterval(updateAuctionTime, 1000);
+
+        } catch (error) {
+            console.error("Error fetching auction time from JSON:", error);
+            document.getElementById('timeRemaining').innerText = "No Auction";
+        }
     }
 
     // Optimized ENS resolution with caching
@@ -160,57 +209,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Function to fetch and display auction time
-    const fetchAuctionTime = async () => {
-        try {
-            const weekIndex = selectedWeek - 1;
-            const url = `https://raw.githubusercontent.com/schoad/cosmos-auctions-data/main/data/week_${weekIndex}.json?timestamp=${new Date().getTime()}`;
-            const response = await fetch(url);
-            
-            if (!response.ok) {
-                throw new Error('No data for this week');
-            }
-
-            const data = await response.json();
-            if (!data.auction || !data.auction.endTime) {
-                throw new Error('Auction time data not available');
-            }
-
-            const endTime = data.auction.endTime * 1000; // Convert Unix timestamp to milliseconds
-            
-            const updateAuctionTime = () => {
-                const now = Date.now();
-                const timeLeft = endTime - now;
-                if (timeLeft > 0) {
-                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                    document.getElementById('timeRemaining').innerText = 
-                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                } else {
-                    document.getElementById('timeRemaining').innerText = 'Auction Ended';
-                    clearInterval(auctionInterval);
-                }
-            };
-
-            if (auctionInterval) {
-                clearInterval(auctionInterval);
-            }
-
-            updateAuctionTime();
-            auctionInterval = setInterval(updateAuctionTime, 1000);
-
-        } catch (error) {
-            console.error("Error fetching auction time from JSON:", error);
-            document.getElementById('timeRemaining').innerText = "No Auction";
-        }
-    };
-
     // Event listener for week selection
     weekSelectIndex.addEventListener('change', async () => {
         selectedWeek = parseInt(weekSelectIndex.value, 10);
-        await fetchBids();
-        await fetchAuctionTime();
+        await fetchWeekData();
         if (isWalletConnected) {
             await fetchUserBid();
         }
@@ -236,8 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     await fetchUserBid();
                     document.getElementById('userInfoTable').classList.remove('hidden');
                     connectWalletBtn.style.display = 'none';
-                    await fetchBids();
-                    await fetchAuctionTime();
+                    await fetchWeekData();
                 } else {
                     console.error('Account is not a string or is undefined:', account);
                     alert('Failed to connect wallet. Please try again.');
@@ -252,8 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Initial fetch of bids and auction time
-    await fetchBids();
-    await fetchAuctionTime();
+    await fetchWeekData();
 
     // Handle wallet events
     if (typeof window.ethereum !== 'undefined') {
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('userInfoTable').classList.add('hidden');
                 connectWalletBtn.style.display = 'block';
                 document.getElementById('walletAddressDisplay').innerText = '';
-                await fetchBids();
+                await fetchWeekData();
             } else {
                 account = accounts[0];
                 await fetchUserBid();
