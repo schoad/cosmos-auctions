@@ -9,14 +9,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let account = null;
     let contract = null;
     let isWalletConnected = false;
-    let selectedWeek = 3;
+    let selectedWeek = 4;
     const weekSelectIndex = document.getElementById('weekSelectIndex');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
 
     // Set default to Week 3
-    weekSelectIndex.value = '3';
+    weekSelectIndex.value = '4';
 
     // Global variable to keep track of the last update time
     window.lastUpdateTime = new Date(0); // Initialize to a very old date
