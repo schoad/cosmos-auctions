@@ -288,3 +288,22 @@ button:hover {
         font-size: 1em;
     }
 }
+
+#bidButtons {
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+}
+
+#placeRaiseBidBtn {
+    width: 50%;
+}
+
+#bidAmount {
+    width: 70%;
+    margin-right: 10px;
+}
+
+#confirmBidBtn {
+    width: 25%;
+}

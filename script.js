@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
-
     // Set default to Week 5
     weekSelectIndex.value = '5';
 
@@ -208,6 +207,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     };
+
+    // Add event listeners for the new buttons
+    document.getElementById('placeRaiseBidBtn').addEventListener('click', showBidInput);
+    document.getElementById('confirmBidBtn').addEventListener('click', confirmBid);
+
+    async function showBidInput() {
+        const minBid = await getRequiredBidAmount(account, selectedWeek - 1);
+        const bidInput = document.getElementById('bidAmount');
+        bidInput.min = ethers.formatEther(minBid);
+        bidInput.value = ethers.formatEther(minBid);
+        document.getElementById('bidButtons').classList.remove('hidden');
+        document.getElementById('placeRaiseBidBtn').classList.add('hidden');
+    }
+
+    async function confirmBid() {
+        const bidAmount = document.getElementById('bidAmount').value;
+        await enterBid(ethers.parseEther(bidAmount), selectedWeek - 1);
+        document.getElementById('bidButtons').classList.add('hidden');
+        document.getElementById('placeRaiseBidBtn').classList.remove('hidden');
+    }
+
+    async function getRequiredBidAmount(user, auctionId) {
+        return await contract.getRequiredBidAmount(user, auctionId);
+    }
+
+    async function enterBid(amount, auctionId) {
+        await contract.enterBid(amount, auctionId);
+        // Close popup or provide feedback
+        alert("Bid placed successfully!");
+    }
 
     // Event listener for week selection
     weekSelectIndex.addEventListener('change', async () => {
