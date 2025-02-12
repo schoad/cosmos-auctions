@@ -9,14 +9,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let account = null;
     let contract = null;
     let isWalletConnected = false;
-    let selectedWeek = 4;
+    let selectedWeek = 5;
     const weekSelectIndex = document.getElementById('weekSelectIndex');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
 
-    // Set default to Week 3
-    weekSelectIndex.value = '4';
+    // Set default to Week 5
+    weekSelectIndex.value = '5';
 
     // Global variable to keep track of the last update time
     window.lastUpdateTime = new Date(0); // Initialize to a very old date
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // New format with user objects
                 processedBids = data.bids.amounts.map((amount, index) => ({
                     amount: amount,
-                    user: data.bids.users[index].ensName || data.bids.users[index].address,
+                    user: data.bids.users[index].ensName || data.bids.users[index].address.slice(0, 6) + '...' + data.bids.users[index].address.slice(-4),
                     rawAddress: data.bids.users[index].address
                 }));
             }
