@@ -3,20 +3,27 @@ import { contractAddress, contractABI } from './config.js';
 import { Cache } from './caching.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize UI state
+    const placeRaiseBidBtn = document.getElementById('placeRaiseBidBtn');
+    const bidButtons = document.getElementById('bidButtons');
     const connectWalletBtn = document.getElementById('connectWalletBtn');
+    
+    // Ensure initial state
+    placeRaiseBidBtn.style.display = 'none';
+    bidButtons.style.display = 'none';
+    connectWalletBtn.style.display = 'block';
     let provider = null;
     let web3Provider = null;
     let account = null;
     let contract = null;
     let isWalletConnected = false;
-    let selectedWeek = 5;
+    let selectedWeek = 6;
     const weekSelectIndex = document.getElementById('weekSelectIndex');
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
-
-    // Set default to Week 5
-    weekSelectIndex.value = '5';
+    // Set default to Week 6
+    weekSelectIndex.value = '6';
 
     // Global variable to keep track of the last update time
     window.lastUpdateTime = new Date(0); // Initialize to a very old date
@@ -194,7 +201,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const weekIndex = selectedWeek - 1;
             const userBid = await contract.getBidForUser(weekIndex, account);
-            document.getElementById('userBid').innerText = ethers.formatEther(userBid.amount);
+            
+            let formattedBid = "...";
+
+            if (userBid.amount === 0n) {
+                formattedBid = "...";
+            } else {
+                formattedBid = ethers.formatEther(userBid.amount);
+            }
+            document.getElementById('userBid').innerText = formattedBid;
             
             if (account) {
                 await resolveENS(account);
@@ -208,6 +223,63 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     };
+
+    // Add event listeners for the new buttons
+    document.getElementById('placeRaiseBidBtn').addEventListener('click', showBidInput);
+    document.getElementById('confirmBidBtn').addEventListener('click', confirmBid);
+
+    async function showBidInput() {
+        const minBid = await getRequiredBidAmount(account, selectedWeek - 1);
+        const bidInput = document.getElementById('bidAmount');
+        bidInput.min = ethers.formatEther(minBid);
+        bidInput.value = ethers.formatEther(minBid);
+        
+        // Hide place bid button
+        const placeRaiseBidBtn = document.getElementById('placeRaiseBidBtn');
+        placeRaiseBidBtn.style.display = 'none';
+        placeRaiseBidBtn.classList.add('hidden');
+        
+        // Show bid buttons
+        const bidButtons = document.getElementById('bidButtons');
+        bidButtons.style.display = 'flex';
+        bidButtons.classList.remove('hidden');
+    }
+    
+    async function confirmBid() {
+        try {
+            const bidAmount = document.getElementById('bidAmount').value;
+            await enterBid(ethers.parseEther(bidAmount), selectedWeek - 1);
+            
+            // Hide bid buttons
+            const bidButtons = document.getElementById('bidButtons');
+            bidButtons.style.display = 'none';
+            bidButtons.classList.add('hidden');
+            
+            // Show place bid button
+            const placeRaiseBidBtn = document.getElementById('placeRaiseBidBtn');
+            placeRaiseBidBtn.style.display = 'block';
+            placeRaiseBidBtn.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error confirming bid:', error);
+            alert('Error placing bid. Please try again.');
+        }
+    }
+
+    async function getRequiredBidAmount(user, auctionId) {
+        return await contract.getRequiredBidAmount(user, auctionId);
+    }
+
+    async function enterBid(amount, auctionId) {
+        try {
+            await contract.enterBid(auctionId, {
+                value: amount
+            });
+            alert("Bid placed successfully!");
+        } catch (error) {
+            console.error("Failed to place bid:", error);
+            alert("Failed to place bid. Please try again.");
+        }
+    }
 
     // Event listener for week selection
     weekSelectIndex.addEventListener('change', async () => {
@@ -232,12 +304,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 account = await signer.getAddress();
         
                 if (account && typeof account === 'string') {
+                    // Hide connect button
+                    document.getElementById('connectWalletBtn').style.display = 'none';
+                    
+                    // Show place bid button
+                    const placeRaiseBidBtn = document.getElementById('placeRaiseBidBtn');
+                    placeRaiseBidBtn.style.display = 'block';
+                    placeRaiseBidBtn.classList.remove('hidden');
+                    
+                    // Ensure bid buttons are hidden
+                    const bidButtons = document.getElementById('bidButtons');
+                    bidButtons.style.display = 'none';
+                    bidButtons.classList.add('hidden');
+                    
+                    // Show user info
+                    document.getElementById('userInfoTable').classList.remove('hidden');
+                    
                     const accountENS = await resolveENS(account);
                     document.getElementById('walletAddressDisplay').innerText = accountENS;
                     
                     await fetchUserBid();
-                    document.getElementById('userInfoTable').classList.remove('hidden');
-                    connectWalletBtn.style.display = 'none';
                     await fetchWeekData();
                 } else {
                     console.error('Account is not a string or is undefined:', account);
@@ -262,9 +348,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (accounts.length === 0) {
                 isWalletConnected = false;
                 account = null;
+                
+                // Hide all bid-related elements
                 document.getElementById('userInfoTable').classList.add('hidden');
-                connectWalletBtn.style.display = 'block';
+                document.getElementById('placeRaiseBidBtn').style.display = 'none';
+                document.getElementById('bidButtons').style.display = 'none';
                 document.getElementById('walletAddressDisplay').innerText = '';
+                
+                // Show connect button
+                document.getElementById('connectWalletBtn').style.display = 'block';
+                
                 await fetchWeekData();
             } else {
                 account = accounts[0];
