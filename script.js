@@ -251,8 +251,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function confirmBid() {
         try {
             const bidAmount = document.getElementById('bidAmount').value;
-            await enterBid(ethers.parseEther(bidAmount), selectedWeek - 1);
-            
+            const userBid = await contract.getBidForUser(selectedWeek - 1, account);
+            const difference = ethers.parseEther(bidAmount).sub(userBid.amount);
+
+            if (difference > 0) {
+                await enterBid(difference, selectedWeek - 1);
+            } else {
+                alert('Your new bid must be higher than your current bid.');
+            }
+
             // Hide bid buttons
             const bidButtons = document.getElementById('bidButtons');
             bidButtons.style.display = 'none';
@@ -272,10 +279,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return await contract.getRequiredBidAmount(user, auctionId);
     }
 
-    async function enterBid(amount, auctionId) {
+    async function enterBid(difference, auctionId) {
         try {
             await contract.enterBid(auctionId, {
-                value: amount
+                value: difference
             });
             alert("Bid placed successfully!");
         } catch (error) {
