@@ -1,5 +1,4 @@
 /* Common styles for both pages */
-
 body {
     background-color: black;
     color: white;
@@ -25,6 +24,7 @@ body {
     margin: 0 auto;
 }
 
+/* Table Styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -50,6 +50,7 @@ th {
     font-weight: bold;
 }
 
+/* Header Bar */
 .header-bar {
     position: fixed;
     top: 0;
@@ -62,13 +63,21 @@ th {
     border-radius: 8px;
     z-index: 100;
     display: flex;
-    justify-content: space-between; /* Center all content in the header-bar */
+    justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
     height: 44px;
     margin: 20px 0;
 }
 
+.header-bar p {
+    margin: 0;
+    flex-grow: 1;
+    text-align: left;
+    order: 1;
+}
+
+/* Button Container */
 .button-container {
     position: fixed;
     bottom: 0px;
@@ -80,11 +89,13 @@ th {
     align-items: center;
     width: calc(100% - 40px);
     max-width: 600px;
-    margin-bottom: 10px; /* Consistent bottom spacing */
+    margin-bottom: 10px;
 }
 
+/* Button Styles */
 .connect-wallet-btn,
-.gallery-btn {
+.gallery-btn,
+#placeRaiseBidBtn {
     position: relative;
     width: 100%;
     background-color: #E7B5A6;
@@ -103,56 +114,63 @@ th {
     color: white;
 }
 
-.gallery-btn, .back-btn {
-    position: relative;
+.gallery-btn:hover,
+.connect-wallet-btn:hover,
+#placeRaiseBidBtn:hover,
+#confirmBidBtn:hover {
+    background-color: #D8A495;
+}
+
+/* Bid Input Section */
+#bidButtons {
     width: 100%;
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#bidAmount {
+    background-color: #E7B5A6;
+    border: none;
+    padding: 12px;
+    height: 20px;
+    border-radius: 8px;
+    color: white;
+    width: 50%;
+    margin-right: 10px;
+    font-size: 12px;
+}
+
+#bidAmount::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#confirmBidBtn {
+    width: 50%;
     background-color: #E7B5A6;
     padding: 12px 24px;
     height: 44px;
     border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    margin: 0;
-    transition: background-color 0.3s;
     font-size: 12px;
     color: white;
-}
-
-.gallery-btn:hover, .back-btn:hover, .connect-wallet-btn:hover {
-    background-color: #D8A495;
-}
-
-.header-bar p {
-    margin: 0;
-    flex-grow: 1; /* Allow COSMOS to take up available space on the left */
-    text-align: left; /* Align text to the left */
-    order: 1; /* Position COSMOS first */
-}
-
-button {
-    background-color: #E7B5A6;
-    color: white;
     border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s;
-    margin-right: 5px;
-    margin-top: 10px;
+    margin: 0;
 }
 
-button:hover {
-    background-color: #D8A495;
+/* Place Bid Button */
+#placeRaiseBidBtn {
+    display: none;
 }
 
-#userBid, #walletAddressDisplay {
+/* User Info Styles */
+#userBid,
+#walletAddressDisplay {
     color: #D83F31;
 }
 
-/* Table column widths */
+/* Table Column Widths */
 #bidsTable th:nth-child(1),
 #bidsTable td:nth-child(1),
 #userInfoTable td:nth-child(1) {
@@ -162,16 +180,16 @@ button:hover {
 #bidsTable th:nth-child(2),
 #bidsTable td:nth-child(2),
 #userInfoTable td:nth-child(2) {
-    width: 15%;
+    width: 20%;
 }
 
 #bidsTable th:nth-child(3),
 #bidsTable td:nth-child(3),
 #userInfoTable td:nth-child(3) {
-    width: 80%;
+    width: 75%;
 }
 
-/* Style for highlighting the user's bid */
+/* User Info Table */
 #userInfoTable td {
     background-color: #D83F31;
     color: white;
@@ -183,17 +201,14 @@ button:hover {
     color: white;
 }
 
-.hidden {
-    display: none;
-}
-
+/* Week Selector */
 .week-selector {
-    order: 2; /* Place week selector in the middle */
+    order: 2;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center content */
-    margin: 0 auto; /* Center the week selector */
-    width: 90px; /* Fixed width */
+    justify-content: center;
+    margin: 0 auto;
+    width: 90px;
     position: relative;
 }
 
@@ -206,7 +221,7 @@ button:hover {
     appearance: none;
     padding: 4px 12px;
     height: 28px;
-    width: 100%; /* Ensure the select takes full width of the parent */
+    width: 100%;
     cursor: pointer;
 }
 
@@ -224,10 +239,10 @@ button:hover {
     box-shadow: 0 0 0 2px #E7B5A6;
 }
 
-/* Bids container with scrolling */
+/* Bids Container */
 #bidsContainer {
     position: fixed;
-    top: calc(44px + 40px); /* Adjust based on header height including margins */
+    top: calc(44px + 40px);
     bottom: calc(44px + 40px);
     left: 50%;
     transform: translateX(-50%);
@@ -239,35 +254,42 @@ button:hover {
 }
 
 #timeRemaining {
-    order: 3; /* Position time remaining on the right */
-    text-align: center; /* Center text within timeRemaining */
-    min-width: 80px; /* Adjust based on the longest expected time format */
+    order: 3;
+    text-align: center;
+    min-width: 80px;
 }
 
+/* Hidden Class */
+.hidden {
+    display: none !important;
+}
+
+/* Mobile Adjustments */
 @media (max-width: 600px) {
-    .auction-time, .header-bar {
+    .auction-time,
+    .header-bar {
         width: calc(100% - 24px);
         padding: 8px 12px;
         font-size: 1em;
         margin: 20px 0;
-        flex-wrap: nowrap; /* Prevent wrapping */
-        justify-content: center; /* Center all content in the header-bar */
+        flex-wrap: nowrap;
+        justify-content: center;
     }
 
-    .button-container {
-        width: calc(100% - 24px);
-    }
-
+    .button-container,
     #bidsContainer {
         width: calc(100% - 24px);
     }
 
-    .container, .gallery {
+    .container,
+    .gallery {
         padding: 0;
         max-height: 100vh;
     }
 
-    table, th, td {
+    table,
+    th,
+    td {
         font-size: 10px;
     }
 
@@ -277,33 +299,19 @@ button:hover {
     }
 
     .week-selector select {
-        font-size: 0.8em; /* Smaller font size for smaller screens */
+        font-size: 0.8em;
     }
 
     #timeRemaining {
-        font-size: 0.8em; /* Smaller font size for smaller screens */
+        font-size: 0.8em;
     }
 
     .header-bar p {
         font-size: 1em;
     }
-}
 
-#bidButtons {
-    display: flex;
-    justify-content: space-between;
-    width: 50%;
-}
+    #bidButtons {
+        width: 100%;
+    }
 
-#placeRaiseBidBtn {
-    width: 50%;
-}
-
-#bidAmount {
-    width: 70%;
-    margin-right: 10px;
-}
-
-#confirmBidBtn {
-    width: 25%;
 }
