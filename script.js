@@ -7,11 +7,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const placeRaiseBidBtn = document.getElementById('placeRaiseBidBtn');
     const bidButtons = document.getElementById('bidButtons');
     const connectWalletBtn = document.getElementById('connectWalletBtn');
-    
+    const toggleDarkModeBtn = document.getElementById('toggleDarkMode');
+
     // Ensure initial state
     placeRaiseBidBtn.style.display = 'none';
     bidButtons.style.display = 'none';
     connectWalletBtn.style.display = 'block';
+
     let provider = null;
     let web3Provider = null;
     let account = null;
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bidsContainer = document.getElementById('bidsContainer');
     const noAuctionMessage = document.getElementById('noAuctionMessage');
     let auctionInterval;
+
     // Set default to Week 6
     weekSelectIndex.value = '6';
 
@@ -390,4 +393,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     adjustIndexPageForMobile();
     window.addEventListener('resize', adjustIndexPageForMobile);
+
+    // Dark Mode Toggle Functionality
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        document.querySelector('.container').classList.toggle('dark-mode');
+        document.querySelector('.header-bar').classList.toggle('dark-mode');
+        document.querySelectorAll('.connect-wallet-btn, .gallery-btn, #placeRaiseBidBtn, #confirmBidBtn').forEach(btn => {
+            btn.classList.toggle('dark-mode');
+        });
+        document.getElementById('bidsTable').classList.toggle('dark-mode');
+        document.getElementById('userInfoTable').classList.toggle('dark-mode');
+    }
+
+    // Add event listener for the COSMOS text
+    toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
 });

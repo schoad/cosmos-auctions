@@ -226,7 +226,7 @@ th {
 }
 
 .week-selector select::after {
-    content: '▼';
+    content: '\u25bc';
     position: absolute;
     right: 10px;
     top: 50%;
@@ -313,5 +313,39 @@ th {
     #bidButtons {
         width: 100%;
     }
-
 }
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+.container.dark-mode {
+    background-color: #1e1e1e;
+}
+
+.header-bar.dark-mode {
+    background-color: black;
+}
+
+.header-bar.dark-mode p {
+    color: white;
+}
+
+.connect-wallet-btn.dark-mode,
+.gallery-btn.dark-mode,
+#placeRaiseBidBtn.dark-mode,
+#confirmBidBtn.dark-mode {
+    background-color: black;
+    color: white;
+}
+
+#bidsTable.dark-mode,
+#userInfoTable.dark-mode {
+    background-color: #1e1e1e;
+    color: white;
+    border-color: white;
+}
+
+/* Add more dark mode styles as needed */
